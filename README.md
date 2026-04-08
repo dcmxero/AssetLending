@@ -26,7 +26,7 @@ cd M2MTask
 
 ### 2. Configure connection string (if needed)
 
-Default in `WebApi/appsettings.json`:
+Default in `Server/WebApi/appsettings.json`:
 ```json
 "ConnectionStrings": {
   "DefaultConnection": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=AssetLendingDb;Trusted_Connection=True;"
@@ -37,7 +37,7 @@ Adjust `Data Source=` if your SQL Server instance name differs.
 ### 3. Run the API (backend)
 
 ```bash
-dotnet run --project WebApi
+dotnet run --project Server/WebApi
 ```
 
 The API will:
@@ -93,7 +93,7 @@ If you see migration errors, delete the database and let it recreate:
 sqllocaldb stop MSSQLLocalDB
 sqllocaldb delete MSSQLLocalDB
 sqllocaldb start MSSQLLocalDB
-dotnet run --project WebApi
+dotnet run --project Server/WebApi
 ```
 
 ---
@@ -105,12 +105,10 @@ The project follows **Clean Architecture** with **DDD** principles:
 ```
 Server/
 ├── Domain          Pure domain model — entities, enums, business rules (no dependencies)
+├── DTOs            Data Transfer Objects shared across layers
 ├── Application     Application services, mappers (refs: Domain, DTOs, Infrastructure)
 ├── Infrastructure  EF Core DbContext, repositories, Unit of Work, seeds (refs: Domain, DTOs)
-└── WebApi          ASP.NET Core Web API — controllers, DI, Swagger (refs: Application, Infrastructure, DTOs)
-Shared/
-└── DTOs            Data Transfer Objects shared across layers
-Test/
+├── WebApi          ASP.NET Core Web API — controllers, DI, Swagger (refs: Application, Infrastructure, DTOs)
 └── WebApi.Tests    Unit tests (xUnit + Moq)
 Client/             Angular 20 SPA (standalone components, routing)
 ```
