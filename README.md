@@ -8,7 +8,7 @@ Before you begin, make sure you have the following installed:
 
 | Tool | Version | Download | Verify |
 |------|---------|----------|--------|
-| **.NET 9 SDK** | 9.0+ | https://dotnet.microsoft.com/download/dotnet/9.0 | `dotnet --version` |
+| **.NET 10 SDK** | 10.0+ | https://dotnet.microsoft.com/download/dotnet/10.0 | `dotnet --version` |
 | **SQL Server LocalDB** | Included with Visual Studio, or install separately | https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/sql-server-express-localdb | `sqllocaldb info` |
 | **Node.js** | 18+ | https://nodejs.org/ | `node -v` |
 | **npm** | Comes with Node.js | — | `npm -v` |
@@ -216,7 +216,7 @@ The Angular SPA provides:
 ## Technologies
 
 **Backend:**
-- .NET 9 / ASP.NET Core Web API
+- .NET 10 / ASP.NET Core Web API
 - Entity Framework Core 9 (SQL Server)
 - Swashbuckle (Swagger/OpenAPI)
 - xUnit + Moq (unit tests)
