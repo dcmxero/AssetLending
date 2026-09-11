@@ -10,7 +10,7 @@ Before you begin, make sure you have the following installed:
 |------|---------|----------|--------|
 | **.NET 10 SDK** | 10.0+ | https://dotnet.microsoft.com/download/dotnet/10.0 | `dotnet --version` |
 | **SQL Server LocalDB** | Included with Visual Studio, or install separately | https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/sql-server-express-localdb | `sqllocaldb info` |
-| **Node.js** | 18+ | https://nodejs.org/ | `node -v` |
+| **Node.js** | 22.22.3+ or 24.15+ | https://nodejs.org/ | `node -v` |
 | **npm** | Comes with Node.js | — | `npm -v` |
 
 > **Tip:** If you have Visual Studio 2022 installed, SQL Server LocalDB is likely already available. If not, install "SQL Server Express LocalDB" from the link above.

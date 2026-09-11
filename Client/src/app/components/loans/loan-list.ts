@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ApiService } from '../../services/api.service';
 import { LoanDto } from '../../models/loan.model';
@@ -53,6 +53,7 @@ import { LoanDto } from '../../models/loan.model';
       </div>
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     .page { padding: 24px; max-width: 1000px; margin: 0 auto; }
     h1 { font-size: 1.5rem; margin-bottom: 16px; }

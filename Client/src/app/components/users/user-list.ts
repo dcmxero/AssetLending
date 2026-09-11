@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { UserDto } from '../../models/user.model';
@@ -53,6 +53,7 @@ import { PaginatedList } from '../../models/common.model';
       }
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     .page { padding: 24px; max-width: 1000px; margin: 0 auto; }
     h1 { font-size: 1.5rem; margin-bottom: 16px; }
