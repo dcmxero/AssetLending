@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
@@ -72,6 +72,7 @@ import { PaginatedList } from '../../models/common.model';
       }
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     .page { padding: 24px; max-width: 1000px; margin: 0 auto; }
     .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }

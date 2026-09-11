@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
@@ -93,6 +93,7 @@ import { AssetDto, AssetCategoryDto } from '../../models/asset.model';
       }
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     .page { padding: 24px; max-width: 1000px; margin: 0 auto; }
     .stats-grid {

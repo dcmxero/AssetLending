@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -132,6 +132,7 @@ import { PaginatedList } from '../../models/common.model';
       }
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     .page { padding: 24px; max-width: 1000px; margin: 0 auto; }
     .back-link { margin-bottom: 12px; }
