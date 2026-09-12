@@ -1,0 +1,40 @@
+.page { padding: 24px; max-width: 1000px; margin: 0 auto; }
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.statCard {
+  background: #fff; border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 16px; text-align: center;
+}
+.statCard.overdue { border-left: 4px solid #e53935; }
+.statValue { font-size: 1.75rem; font-weight: 700; color: #1a1a2e; }
+.statLabel { font-size: 0.8rem; color: #888; margin-top: 4px; }
+.statCard.overdue .statValue { color: #e53935; }
+
+.page h2 { font-size: 1.15rem; color: #1a1a2e; margin-bottom: 12px; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.filters { display: flex; gap: 10px; }
+.filters select { padding: 7px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.85rem; }
+
+.card { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; }
+.card table { width: 100%; border-collapse: collapse; }
+.card th { text-align: left; padding: 10px 16px; font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #eee; }
+.card td { padding: 10px 16px; border-bottom: 1px solid #f5f5f5; font-size: 0.9rem; }
+.empty { text-align: center; color: #888; padding: 24px; }
+
+.badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+.badgeAvailable { background: #e8f5e9; color: #2e7d32; }
+.badgeLoaned { background: #fff3e0; color: #e65100; }
+.badgeReserved { background: #e3f2fd; color: #1565c0; }
+
+.btn { padding: 6px 14px; border: none; border-radius: 6px; cursor: pointer; text-decoration: none; font-size: 0.85rem; }
+.btnPrimary { background: #1a1a2e; color: white; }
+.btnSm { background: #f0f0f0; color: #333; }
+
+.pagination { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 12px; }
+.pagination button { padding: 6px 14px; border: 1px solid #ddd; border-radius: 6px; background: white; cursor: pointer; font-size: 0.85rem; }
+.pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
