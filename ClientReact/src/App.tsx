@@ -3,6 +3,8 @@ import { Navbar } from './components/layout/Navbar';
 import { Dashboard } from './pages/Dashboard';
 import { AssetCreate } from './pages/AssetCreate';
 import { AssetDetail } from './pages/AssetDetail';
+import { LoanList } from './pages/LoanList';
+import { UserList } from './pages/UserList';
 
 export function App() {
   return (
@@ -14,6 +16,8 @@ export function App() {
         <Route path="/assets" element={<Navigate to="/dashboard" replace />} />
         <Route path="/assets/new" element={<AssetCreate />} />
         <Route path="/assets/:id" element={<AssetDetail />} />
+        <Route path="/loans" element={<LoanList />} />
+        <Route path="/users" element={<UserList />} />
       </Routes>
     </>
   );
