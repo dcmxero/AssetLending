@@ -1,6 +1,8 @@
 # Asset Lending System
 
-Full-stack application for managing internal asset lending — tracking loans and reservations of company equipment (laptops, tools, monitors, etc.). Includes a REST API backend and an Angular frontend.
+Full-stack application for managing internal asset lending — tracking loans and reservations of company equipment (laptops, tools, monitors, etc.). Includes a REST API backend and two interchangeable frontends — the original Angular SPA and a
+standalone React SPA. Both talk to the same API and render the same screens; pick whichever one you
+want to run.
 
 ## Prerequisites
 
@@ -49,7 +51,12 @@ The API will:
 
 > **Keep this terminal open** — the API must be running for the frontend to work.
 
-### 4. Run the Angular frontend (in a new terminal)
+### 4. Run a frontend (in a new terminal)
+
+Two frontends ship with the project. They are independent applications with the same
+functionality — run either one, or both at once, since they use different ports.
+
+**Angular** — http://localhost:4200
 
 ```bash
 cd Client
@@ -57,9 +64,20 @@ npm install
 npm start
 ```
 
-Open **http://localhost:4200** in the browser.
+**React** — http://localhost:4300
 
-> First run of `npm install` may take a few minutes. Alternatively, you can use `ng serve` if you have Angular CLI installed globally (`npm install -g @angular/cli`). Both commands do the same thing.
+```bash
+cd ClientReact
+npm install
+npm start
+```
+
+> First run of `npm install` may take a few minutes. For the Angular client you can also use
+> `ng serve` if you have the Angular CLI installed globally (`npm install -g @angular/cli`);
+> both commands do the same thing.
+
+Both clients call the API at `https://localhost:7197/api` by default. The React client reads
+`VITE_API_BASE_URL` if you need to point it somewhere else.
 
 ### 5. Open Swagger UI (API documentation)
 
@@ -110,8 +128,12 @@ Server/
 ├── Infrastructure  EF Core DbContext, repositories, Unit of Work, seeds (refs: Domain, DTOs)
 ├── WebApi          ASP.NET Core Web API — controllers, DI, Swagger (refs: Application, Infrastructure, DTOs)
 └── WebApi.Tests    Unit tests (xUnit + Moq)
-Client/             Angular 20 SPA (standalone components, routing)
+Client/             Angular SPA (standalone components, routing)
+ClientReact/        React SPA (Vite, React Router, TanStack Query)
 ```
+
+The solution file covers the `Server/` projects only. The two frontends have their own npm
+toolchains and are not part of the MSBuild build — open them as folders, not through the solution.
 
 **Key patterns:**
 - **Repository pattern** — generic base + specialized repositories
@@ -217,11 +239,18 @@ The Angular SPA provides:
 
 **Backend:**
 - .NET 10 / ASP.NET Core Web API
-- Entity Framework Core 9 (SQL Server)
+- Entity Framework Core 10 (SQL Server)
 - Swashbuckle (Swagger/OpenAPI)
 - xUnit + Moq (unit tests)
 
-**Frontend:**
-- Angular 20 (standalone components)
+**Frontend (Angular):**
+- Angular (standalone components)
 - TypeScript
 - Angular Router
+
+**Frontend (React):**
+- React 19
+- TypeScript
+- Vite
+- React Router
+- TanStack Query

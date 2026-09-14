@@ -1,0 +1,18 @@
+.page { padding: 24px; max-width: 600px; margin: 0 auto; }
+.page h1 { font-size: 1.5rem; margin-bottom: 16px; }
+.card {
+  background: #fff; border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 24px;
+}
+.formGroup { margin-bottom: 16px; }
+.formGroup label { display: block; font-size: 0.85rem; font-weight: 600; color: #555; margin-bottom: 6px; }
+.formGroup input, .formGroup textarea, .formGroup select {
+  width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px;
+  font-size: 0.9rem; font-family: inherit;
+}
+.formActions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px; }
+.btn { padding: 10px 20px; border: 1px solid #ddd; border-radius: 6px;
+       background: #fff; cursor: pointer; font-size: 0.9rem; }
+.btnPrimary { background: #1a1a2e; color: #fff; border: none; font-weight: 500; }
+.btnPrimary:disabled { opacity: 0.5; cursor: default; }
+.error { color: #e53935; font-size: 0.85rem; margin-bottom: 12px; }

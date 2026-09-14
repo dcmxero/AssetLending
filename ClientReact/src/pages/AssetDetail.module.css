@@ -1,0 +1,52 @@
+.page { padding: 24px; max-width: 1000px; margin: 0 auto; }
+.backLink { margin-bottom: 12px; }
+.backLink a { color: #1a1a2e; text-decoration: none; font-size: 0.9rem; }
+.backLink a:hover { text-decoration: underline; }
+.page h1 { font-size: 1.5rem; margin-bottom: 16px; }
+.page h2 { font-size: 1.15rem; margin: 24px 0 12px; }
+.page h3 { font-size: 1rem; margin-bottom: 14px; color: #1a1a2e; }
+.loading { color: #888; }
+
+.topRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.topRow > .card {
+  min-height: 280px;
+}
+@media (max-width: 700px) {
+  .topRow { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: #fff; border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden;
+}
+.infoCard { padding: 20px; }
+.infoRow { display: flex; gap: 12px; padding: 6px 0; font-size: 0.9rem; }
+.infoRow .label { font-weight: 600; color: #888; min-width: 120px; }
+.badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+.badgeAvailable { background: #e8f5e9; color: #2e7d32; }
+.badgeLoaned { background: #fff3e0; color: #e65100; }
+.badgeReserved { background: #e3f2fd; color: #1565c0; }
+
+.actionCard { padding: 20px; }
+.statusInfo { color: #666; font-size: 0.9rem; line-height: 1.5; }
+.formGroup { margin-bottom: 12px; }
+.formGroup label { display: block; font-size: 0.8rem; font-weight: 600; color: #555; margin-bottom: 4px; }
+.formGroup input, .formGroup select {
+  width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem;
+}
+.btnPrimary { background: #1a1a2e; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; font-weight: 500; }
+.btnPrimary:disabled { opacity: 0.5; cursor: default; }
+.msg { font-size: 0.85rem; margin-bottom: 8px; padding: 8px; border-radius: 6px; }
+.error { color: #e53935; background: #ffeaea; }
+.success { color: #2e7d32; background: #e8f5e9; }
+
+.card table { width: 100%; border-collapse: collapse; }
+.card th { text-align: left; padding: 12px 16px; font-size: 0.8rem; color: #888;
+     text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #eee; }
+.card td { padding: 12px 16px; border-bottom: 1px solid #f5f5f5; font-size: 0.9rem; }
+.empty { text-align: center; color: #888; padding: 32px 16px; }
