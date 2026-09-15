@@ -26,9 +26,9 @@ public static class DataSeed
 
         var users = new List<User>
         {
-            new() { FirstName = "Ján", LastName = "Novák", Email = "jan.novak@m2ms.sk" },
-            new() { FirstName = "Mária", LastName = "Horváthová", Email = "maria.horvathova@m2ms.sk" },
-            new() { FirstName = "Peter", LastName = "Kováč", Email = "peter.kovac@m2ms.sk" }
+            new() { FirstName = "Ján", LastName = "Novák", Email = "jan.novak@example.com" },
+            new() { FirstName = "Mária", LastName = "Horváthová", Email = "maria.horvathova@example.com" },
+            new() { FirstName = "Peter", LastName = "Kováč", Email = "peter.kovac@example.com" }
         };
 
         context.Users.AddRange(users);
