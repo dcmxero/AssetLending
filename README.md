@@ -59,7 +59,7 @@ functionality — run either one, or both at once, since they use different port
 **Angular** — http://localhost:4200
 
 ```bash
-cd Client
+cd ClientAngular
 npm install
 npm start
 ```
@@ -128,7 +128,7 @@ Server/
 ├── Infrastructure  EF Core DbContext, repositories, Unit of Work, seeds (refs: Domain, DTOs)
 ├── WebApi          ASP.NET Core Web API — controllers, DI, Swagger (refs: Application, Infrastructure, DTOs)
 └── WebApi.Tests    Unit tests (xUnit + Moq)
-Client/             Angular SPA (standalone components, routing)
+ClientAngular/      Angular SPA (standalone components, routing)
 ClientReact/        React SPA (Vite, React Router, TanStack Query)
 ```
 
