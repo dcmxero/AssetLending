@@ -17,6 +17,15 @@ Before you begin, make sure you have the following installed:
 
 > **Tip:** If you have Visual Studio 2022 installed, SQL Server LocalDB is likely already available. If not, install "SQL Server Express LocalDB" from the link above.
 
+### A note on IDEs
+
+Everything below runs on the `dotnet` CLI and npm — **no IDE is required**, and that is the
+supported path. `dotnet build`, `dotnet run` and `dotnet test` cover the whole server.
+
+If you do want to open `AssetLending.sln`, note that **.NET 10 projects need Visual Studio 2026
+or newer**. Visual Studio 2022 tops out at .NET 9 and will report "load failed" for every project
+in `Server/`. Rider and VS Code (with the C# Dev Kit) also work.
+
 ## Setup & Run
 
 ### 1. Clone the repository
@@ -134,6 +143,7 @@ ClientReact/        React SPA (Vite, React Router, TanStack Query)
 
 The solution file covers the `Server/` projects only. The two frontends have their own npm
 toolchains and are not part of the MSBuild build — open them as folders, not through the solution.
+See the IDE note under Prerequisites for the Visual Studio version the solution requires.
 
 **Key patterns:**
 - **Repository pattern** — generic base + specialized repositories
