@@ -14,17 +14,21 @@ Before you begin, make sure you have the following installed:
 | **SQL Server LocalDB** | Included with Visual Studio, or install separately | https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/sql-server-express-localdb | `sqllocaldb info` |
 | **Node.js** | 22.22.3+ or 24.15+ | https://nodejs.org/ | `node -v` |
 | **npm** | Comes with Node.js | — | `npm -v` |
+| **Visual Studio** *(optional)* | 2026+ — see the IDE note below | https://visualstudio.microsoft.com/ | Help → About |
 
 > **Tip:** If you have Visual Studio 2022 installed, SQL Server LocalDB is likely already available. If not, install "SQL Server Express LocalDB" from the link above.
 
 ### A note on IDEs
 
-Everything below runs on the `dotnet` CLI and npm — **no IDE is required**, and that is the
-supported path. `dotnet build`, `dotnet run` and `dotnet test` cover the whole server.
+**No IDE is required, and the CLI is the supported path.** Everything in this README runs on the
+`dotnet` CLI and npm: `dotnet build`, `dotnet run` and `dotnet test` cover the whole server, and
+the two frontends are plain npm projects. Nothing here depends on Visual Studio.
 
-If you do want to open `AssetLending.sln`, note that **.NET 10 projects need Visual Studio 2026
-or newer**. Visual Studio 2022 tops out at .NET 9 and will report "load failed" for every project
-in `Server/`. Rider and VS Code (with the C# Dev Kit) also work.
+Opening `AssetLending.sln` is a different matter: **.NET 10 projects require Visual Studio 2026 or
+newer.** Visual Studio 2022 caps out at .NET 9 and reports "load failed" for every project under
+`Server/` — this is a Visual Studio limitation, not a problem with the solution. If you are on
+VS 2022 and would rather not install VS 2026, use the CLI, or open the repository in Rider or
+VS Code with the C# Dev Kit; all three build and test the server without the solution file.
 
 ## Setup & Run
 
