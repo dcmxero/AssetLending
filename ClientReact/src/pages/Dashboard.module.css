@@ -24,7 +24,7 @@
 .card table { width: 100%; border-collapse: collapse; }
 .card th { text-align: left; padding: 10px 16px; font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #eee; }
 .card td { padding: 10px 16px; border-bottom: 1px solid #f5f5f5; font-size: 0.9rem; }
-.empty { text-align: center; color: #888; padding: 24px; }
+td.empty { text-align: center; color: #888; padding: 24px; }
 
 .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
 .badgeAvailable { background: #e8f5e9; color: #2e7d32; }
