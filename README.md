@@ -35,8 +35,8 @@ VS Code with the C# Dev Kit; all three build and test the server without the sol
 ### 1. Clone the repository
 
 ```bash
-git clone <repo-url>
-cd M2MTask
+git clone https://github.com/dcmxero/AssetLending.git
+cd AssetLending
 ```
 
 ### 2. Configure connection string (if needed)
