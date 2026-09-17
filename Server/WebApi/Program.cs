@@ -1,5 +1,6 @@
-using Application.Services;
+﻿using Application.Services;
 using Infrastructure;
+using Infrastructure.Queries;
 using Infrastructure.Repositories.AssetManagement;
 using Infrastructure.Repositories.Identity;
 using Infrastructure.Seeds;
@@ -23,6 +24,9 @@ builder.Services.AddScoped<IAssetRepository, AssetRepository>();
 builder.Services.AddScoped<ILoanRepository, LoanRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IAssetCategoryRepository, AssetCategoryRepository>();
+
+// Queries
+builder.Services.AddScoped<IStatisticsQueries, StatisticsQueries>();
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();
