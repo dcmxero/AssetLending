@@ -1,8 +1,9 @@
-using Application.Mappers;
+﻿using Application.Mappers;
 using Domain.Common;
 using Domain.Models.AssetManagement;
 using DTOs.Asset;
 using DTOs.Common;
+using Infrastructure.Queries;
 using Infrastructure.Repositories.AssetManagement;
 using Infrastructure.Repositories.Identity;
 using Infrastructure.UnitOfWork;
@@ -16,6 +17,7 @@ namespace Application.Services;
 /// </summary>
 public sealed class LoanService(
     ILoanRepository loanRepository,
+    ILoanQueries loanQueries,
     IAssetRepository assetRepository,
     IUserRepository userRepository,
     IReservationRepository reservationRepository,
@@ -25,26 +27,17 @@ public sealed class LoanService(
 {
     public async Task<List<LoanDto>> GetActiveLoansAsync(CancellationToken cancellationToken = default)
     {
-        var loans = await loanRepository.GetActiveLoansAsync(cancellationToken);
-        return [.. loans.Select(l => l.ToDto())];
+        return await loanQueries.GetActiveLoansAsync(cancellationToken);
     }
 
     public async Task<PaginatedList<LoanDto>> GetAllLoansAsync(int page, int pageSize, CancellationToken cancellationToken = default)
     {
-        var (items, totalCount) = await loanRepository.GetAllLoansAsync(page, pageSize, cancellationToken);
-        return new PaginatedList<LoanDto>
-        {
-            Data = [.. items.Select(l => l.ToDto())],
-            TotalCount = totalCount,
-            PageIndex = page,
-            PageSize = pageSize
-        };
+        return await loanQueries.GetAllLoansAsync(page, pageSize, cancellationToken);
     }
 
     public async Task<List<LoanDto>> GetOverdueLoansAsync(CancellationToken cancellationToken = default)
     {
-        var loans = await loanRepository.GetOverdueLoansAsync(cancellationToken);
-        return [.. loans.Select(l => l.ToDto())];
+        return await loanQueries.GetOverdueLoansAsync(cancellationToken);
     }
 
     public async Task<Result<LoanDto>> CreateLoanAsync(CreateLoanDto dto, CancellationToken cancellationToken = default)
@@ -166,13 +159,6 @@ public sealed class LoanService(
 
     public async Task<PaginatedList<LoanDto>> GetLoansByAssetIdAsync(int assetId, int page, int pageSize, CancellationToken cancellationToken = default)
     {
-        var (items, totalCount) = await loanRepository.GetLoansByAssetIdAsync(assetId, page, pageSize, cancellationToken);
-        return new PaginatedList<LoanDto>
-        {
-            Data = [.. items.Select(l => l.ToDto())],
-            TotalCount = totalCount,
-            PageIndex = page,
-            PageSize = pageSize
-        };
+        return await loanQueries.GetLoansByAssetIdAsync(assetId, page, pageSize, cancellationToken);
     }
 }
