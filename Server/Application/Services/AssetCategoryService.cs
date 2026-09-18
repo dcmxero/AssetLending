@@ -1,8 +1,8 @@
-using Application.Mappers;
+﻿using Application.Mappers;
 using DTOs.Asset;
+using Infrastructure.Queries;
 using Infrastructure.Repositories.AssetManagement;
 using Infrastructure.UnitOfWork;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
@@ -12,6 +12,7 @@ namespace Application.Services;
 /// </summary>
 public sealed class AssetCategoryService(
     IAssetCategoryRepository categoryRepository,
+    IAssetCategoryQueries categoryQueries,
     IUnitOfWork unitOfWork,
     ILogger<AssetCategoryService> logger)
     : IAssetCategoryService
@@ -19,18 +20,13 @@ public sealed class AssetCategoryService(
     /// <inheritdoc />
     public async Task<List<AssetCategoryDto>> GetAllCategoriesAsync(CancellationToken cancellationToken = default)
     {
-        var categories = await categoryRepository.GetAll()
-            .OrderBy(c => c.Name)
-            .ToListAsync(cancellationToken);
-
-        return [.. categories.Select(c => c.ToDto())];
+        return await categoryQueries.GetAllCategoriesAsync(cancellationToken);
     }
 
     /// <inheritdoc />
     public async Task<AssetCategoryDto?> GetCategoryByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var category = await categoryRepository.GetByIdAsync(id, cancellationToken);
-        return category?.ToDto();
+        return await categoryQueries.GetCategoryByIdAsync(id, cancellationToken);
     }
 
     /// <inheritdoc />

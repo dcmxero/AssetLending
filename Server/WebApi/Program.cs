@@ -27,8 +27,10 @@ builder.Services.AddScoped<IAssetCategoryRepository, AssetCategoryRepository>();
 
 // Queries
 builder.Services.AddScoped<IAssetQueries, AssetQueries>();
+builder.Services.AddScoped<IAssetCategoryQueries, AssetCategoryQueries>();
 builder.Services.AddScoped<ILoanQueries, LoanQueries>();
 builder.Services.AddScoped<IStatisticsQueries, StatisticsQueries>();
+builder.Services.AddScoped<IUserQueries, UserQueries>();
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();

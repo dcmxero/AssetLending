@@ -1,7 +1,8 @@
-using Application.Mappers;
+﻿using Application.Mappers;
 using Domain.Common;
 using DTOs.Common;
 using DTOs.User;
+using Infrastructure.Queries;
 using Infrastructure.Repositories.Identity;
 using Infrastructure.UnitOfWork;
 using Microsoft.Extensions.Logging;
@@ -13,26 +14,19 @@ namespace Application.Services;
 /// </summary>
 public sealed class UserService(
     IUserRepository userRepository,
+    IUserQueries userQueries,
     IUnitOfWork unitOfWork,
     ILogger<UserService> logger)
     : IUserService
 {
     public async Task<PaginatedList<UserDto>> GetUsersAsync(int page, int pageSize, CancellationToken cancellationToken = default)
     {
-        var (items, totalCount) = await userRepository.GetUsersAsync(page, pageSize, cancellationToken);
-        return new PaginatedList<UserDto>
-        {
-            Data = [.. items.Select(u => u.ToDto())],
-            TotalCount = totalCount,
-            PageIndex = page,
-            PageSize = pageSize
-        };
+        return await userQueries.GetUsersAsync(page, pageSize, cancellationToken);
     }
 
     public async Task<UserDto?> GetUserByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var user = await userRepository.GetByIdAsync(id, cancellationToken);
-        return user?.ToDto();
+        return await userQueries.GetUserByIdAsync(id, cancellationToken);
     }
 
     public async Task<Result<UserDto>> CreateUserAsync(CreateUserDto dto, CancellationToken cancellationToken = default)
