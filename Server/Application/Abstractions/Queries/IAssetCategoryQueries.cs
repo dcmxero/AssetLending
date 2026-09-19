@@ -1,6 +1,6 @@
 using DTOs.Asset;
 
-namespace Infrastructure.Queries;
+namespace Application.Abstractions.Queries;
 
 /// <summary>
 /// Read-side contract for asset category data.

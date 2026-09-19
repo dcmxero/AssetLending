@@ -1,6 +1,6 @@
 using Domain.Models.Identity;
 
-namespace Infrastructure.Repositories.Identity;
+namespace Application.Abstractions.Persistence;
 
 /// <summary>
 /// Repository interface for user write operations.
@@ -24,7 +24,7 @@ public interface IUserRepository
     Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Adds a new user to the context. Changes are not persisted until <see cref="UnitOfWork.IUnitOfWork.CompleteAsync"/> is called.
+    /// Adds a new user to the context. Changes are not persisted until <see cref="IUnitOfWork.CompleteAsync"/> is called.
     /// </summary>
     /// <param name="user">The user to add.</param>
     /// <param name="cancellationToken">Cancellation token.</param>

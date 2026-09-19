@@ -1,12 +1,10 @@
-﻿using Application.Mappers;
+﻿using Application.Abstractions.Persistence;
+using Application.Abstractions.Queries;
+using Application.Mappers;
 using Domain.Common;
 using Domain.Enums;
 using DTOs.Asset;
 using DTOs.Common;
-using Infrastructure.Queries;
-using Infrastructure.Repositories.AssetManagement;
-using Infrastructure.UnitOfWork;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
@@ -59,7 +57,7 @@ public sealed class AssetService(
         {
             await unitOfWork.CompleteAsync(cancellationToken);
         }
-        catch (DbUpdateConcurrencyException)
+        catch (ConcurrencyConflictException)
         {
             logger.LogWarning("Concurrency conflict updating asset {AssetId}", id);
             return Result.Failure<AssetDto>("The asset was modified by another user. Please try again.");
@@ -89,7 +87,7 @@ public sealed class AssetService(
         {
             await unitOfWork.CompleteAsync(cancellationToken);
         }
-        catch (DbUpdateConcurrencyException)
+        catch (ConcurrencyConflictException)
         {
             logger.LogWarning("Concurrency conflict deactivating asset {AssetId}", id);
             return Result.Failure<AssetDto>("The asset was modified by another user. Please try again.");
@@ -119,7 +117,7 @@ public sealed class AssetService(
         {
             await unitOfWork.CompleteAsync(cancellationToken);
         }
-        catch (DbUpdateConcurrencyException)
+        catch (ConcurrencyConflictException)
         {
             logger.LogWarning("Concurrency conflict activating asset {AssetId}", id);
             return Result.Failure<AssetDto>("The asset was modified by another user. Please try again.");

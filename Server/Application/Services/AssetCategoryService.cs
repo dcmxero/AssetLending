@@ -1,8 +1,7 @@
-﻿using Application.Mappers;
+﻿using Application.Abstractions.Persistence;
+using Application.Abstractions.Queries;
+using Application.Mappers;
 using DTOs.Asset;
-using Infrastructure.Queries;
-using Infrastructure.Repositories.AssetManagement;
-using Infrastructure.UnitOfWork;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;

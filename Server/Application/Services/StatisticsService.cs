@@ -1,5 +1,5 @@
+using Application.Abstractions.Queries;
 using DTOs.Common;
-using Infrastructure.Queries;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;

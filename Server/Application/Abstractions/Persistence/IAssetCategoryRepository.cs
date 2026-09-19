@@ -1,6 +1,6 @@
 using Domain.Models.AssetManagement;
 
-namespace Infrastructure.Repositories.AssetManagement;
+namespace Application.Abstractions.Persistence;
 
 /// <summary>
 /// Repository interface for asset category write operations.
@@ -8,7 +8,7 @@ namespace Infrastructure.Repositories.AssetManagement;
 public interface IAssetCategoryRepository
 {
     /// <summary>
-    /// Adds a new asset category to the context. Changes are not persisted until <see cref="UnitOfWork.IUnitOfWork.CompleteAsync"/> is called.
+    /// Adds a new asset category to the context. Changes are not persisted until <see cref="IUnitOfWork.CompleteAsync"/> is called.
     /// </summary>
     /// <param name="category">The category to add.</param>
     /// <param name="cancellationToken">Cancellation token.</param>

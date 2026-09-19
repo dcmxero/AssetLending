@@ -1,10 +1,9 @@
-﻿using Application.Mappers;
+﻿using Application.Abstractions.Persistence;
+using Application.Abstractions.Queries;
+using Application.Mappers;
 using Domain.Common;
 using DTOs.Common;
 using DTOs.User;
-using Infrastructure.Queries;
-using Infrastructure.Repositories.Identity;
-using Infrastructure.UnitOfWork;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;

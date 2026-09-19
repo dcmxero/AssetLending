@@ -1,11 +1,8 @@
+using Application.Abstractions.Persistence;
 using Application.Mappers;
 using Domain.Common;
 using Domain.Models.AssetManagement;
 using DTOs.Asset;
-using Infrastructure.Repositories.AssetManagement;
-using Infrastructure.Repositories.Identity;
-using Infrastructure.UnitOfWork;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
@@ -67,7 +64,7 @@ public sealed class ReservationService(
         {
             await unitOfWork.CompleteAsync(cancellationToken);
         }
-        catch (DbUpdateConcurrencyException)
+        catch (ConcurrencyConflictException)
         {
             logger.LogWarning("Concurrency conflict creating reservation for asset {AssetId}", dto.AssetId);
             return Result.Failure<ReservationDto>("The asset was modified by another user. Please try again.");
@@ -107,7 +104,7 @@ public sealed class ReservationService(
         {
             await unitOfWork.CompleteAsync(cancellationToken);
         }
-        catch (DbUpdateConcurrencyException)
+        catch (ConcurrencyConflictException)
         {
             logger.LogWarning("Concurrency conflict cancelling reservation {ReservationId}", reservationId);
             return Result.Failure<ReservationDto>("The asset was modified by another user. Please try again.");

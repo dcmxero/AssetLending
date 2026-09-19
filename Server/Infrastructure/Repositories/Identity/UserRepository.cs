@@ -1,3 +1,4 @@
+using Application.Abstractions.Persistence;
 using Domain.Models.Identity;
 using Microsoft.EntityFrameworkCore;
 

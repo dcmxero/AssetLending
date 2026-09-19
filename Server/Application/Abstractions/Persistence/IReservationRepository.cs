@@ -1,6 +1,6 @@
 using Domain.Models.AssetManagement;
 
-namespace Infrastructure.Repositories.AssetManagement;
+namespace Application.Abstractions.Persistence;
 
 /// <summary>
 /// Repository interface for reservation write operations.
@@ -24,7 +24,7 @@ public interface IReservationRepository
     Task<Reservation?> GetActiveByAssetIdAsync(int assetId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Adds a new reservation to the context. Changes are not persisted until <see cref="UnitOfWork.IUnitOfWork.CompleteAsync"/> is called.
+    /// Adds a new reservation to the context. Changes are not persisted until <see cref="IUnitOfWork.CompleteAsync"/> is called.
     /// </summary>
     /// <param name="reservation">The reservation to add.</param>
     /// <param name="cancellationToken">Cancellation token.</param>

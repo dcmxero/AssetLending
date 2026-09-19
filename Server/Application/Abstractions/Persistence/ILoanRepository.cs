@@ -1,6 +1,6 @@
 using Domain.Models.AssetManagement;
 
-namespace Infrastructure.Repositories.AssetManagement;
+namespace Application.Abstractions.Persistence;
 
 /// <summary>
 /// Repository interface for loan write operations.
@@ -16,7 +16,7 @@ public interface ILoanRepository
     Task<Loan?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Adds a new loan to the context. Changes are not persisted until <see cref="UnitOfWork.IUnitOfWork.CompleteAsync"/> is called.
+    /// Adds a new loan to the context. Changes are not persisted until <see cref="IUnitOfWork.CompleteAsync"/> is called.
     /// </summary>
     /// <param name="loan">The loan to add.</param>
     /// <param name="cancellationToken">Cancellation token.</param>

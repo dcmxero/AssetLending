@@ -1,7 +1,7 @@
 using DTOs.Common;
 using DTOs.User;
 
-namespace Infrastructure.Queries;
+namespace Application.Abstractions.Queries;
 
 /// <summary>
 /// Read-side contract for user data.

@@ -1,6 +1,6 @@
 using DTOs.Common;
 
-namespace Infrastructure.Queries;
+namespace Application.Abstractions.Queries;
 
 /// <summary>
 /// Read-side contract for aggregated lending system statistics.

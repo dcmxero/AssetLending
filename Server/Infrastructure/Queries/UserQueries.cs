@@ -1,8 +1,9 @@
-using System.Linq.Expressions;
+using Application.Abstractions.Queries;
 using Domain.Models.Identity;
 using DTOs.Common;
 using DTOs.User;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Infrastructure.Queries;
 

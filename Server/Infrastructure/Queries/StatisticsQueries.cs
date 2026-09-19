@@ -1,3 +1,4 @@
+using Application.Abstractions.Queries;
 using Domain.Enums;
 using DTOs.Common;
 using Microsoft.EntityFrameworkCore;

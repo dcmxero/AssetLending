@@ -1,6 +1,6 @@
 using Domain.Models.AssetManagement;
 
-namespace Infrastructure.Repositories.AssetManagement;
+namespace Application.Abstractions.Persistence;
 
 /// <summary>
 /// Repository interface for asset write operations.
@@ -16,7 +16,7 @@ public interface IAssetRepository
     Task<Asset?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Adds a new asset to the context. Changes are not persisted until <see cref="UnitOfWork.IUnitOfWork.CompleteAsync"/> is called.
+    /// Adds a new asset to the context. Changes are not persisted until <see cref="IUnitOfWork.CompleteAsync"/> is called.
     /// </summary>
     /// <param name="asset">The asset to add.</param>
     /// <param name="cancellationToken">Cancellation token.</param>

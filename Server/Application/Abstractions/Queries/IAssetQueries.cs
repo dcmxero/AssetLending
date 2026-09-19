@@ -2,7 +2,7 @@ using Domain.Enums;
 using DTOs.Asset;
 using DTOs.Common;
 
-namespace Infrastructure.Queries;
+namespace Application.Abstractions.Queries;
 
 /// <summary>
 /// Read-side contract for asset data.

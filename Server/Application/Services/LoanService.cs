@@ -1,13 +1,10 @@
-﻿using Application.Mappers;
+﻿using Application.Abstractions.Persistence;
+using Application.Abstractions.Queries;
+using Application.Mappers;
 using Domain.Common;
 using Domain.Models.AssetManagement;
 using DTOs.Asset;
 using DTOs.Common;
-using Infrastructure.Queries;
-using Infrastructure.Repositories.AssetManagement;
-using Infrastructure.Repositories.Identity;
-using Infrastructure.UnitOfWork;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
@@ -106,7 +103,7 @@ public sealed class LoanService(
         {
             await unitOfWork.CompleteAsync(cancellationToken);
         }
-        catch (DbUpdateConcurrencyException)
+        catch (ConcurrencyConflictException)
         {
             logger.LogWarning("Concurrency conflict creating loan for asset {AssetId}", dto.AssetId);
             return Result.Failure<LoanDto>("The asset was modified by another user. Please try again.");
@@ -146,7 +143,7 @@ public sealed class LoanService(
         {
             await unitOfWork.CompleteAsync(cancellationToken);
         }
-        catch (DbUpdateConcurrencyException)
+        catch (ConcurrencyConflictException)
         {
             logger.LogWarning("Concurrency conflict returning loan {LoanId}", loanId);
             return Result.Failure<LoanDto>("The asset was modified by another user. Please try again.");

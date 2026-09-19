@@ -1,3 +1,6 @@
+using Application.Abstractions.Persistence;
+using Microsoft.EntityFrameworkCore;
+
 namespace Infrastructure.UnitOfWork;
 
 /// <summary>
@@ -8,6 +11,13 @@ public sealed class UnitOfWork(ApplicationDbContext context)
 {
     public async Task CompleteAsync(CancellationToken cancellationToken = default)
     {
-        await context.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await context.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException exception)
+        {
+            throw new ConcurrencyConflictException(exception);
+        }
     }
 }
