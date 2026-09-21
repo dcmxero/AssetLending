@@ -1,33 +1,28 @@
+using Application.Abstractions.Persistence;
 using Domain.Models.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.Identity;
 
 /// <summary>
-/// Repository for user-specific data access operations.
+/// Repository for user write operations.
 /// </summary>
 public sealed class UserRepository(ApplicationDbContext context)
-    : GenericRepository<User>(context), IUserRepository
+    : IUserRepository
 {
+    public async Task<User?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await context.Users.FindAsync([id], cancellationToken);
+    }
+
     public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
-        return await Context.Users
+        return await context.Users
             .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }
 
-    public async Task<(List<User> Items, int TotalCount)> GetUsersAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+    public async Task AddAsync(User user, CancellationToken cancellationToken = default)
     {
-        var query = Context.Users.AsQueryable();
-
-        var totalCount = await query.CountAsync(cancellationToken);
-
-        var items = await query
-            .OrderBy(u => u.LastName)
-            .ThenBy(u => u.FirstName)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync(cancellationToken);
-
-        return ([.. items], totalCount);
+        await context.Users.AddAsync(user, cancellationToken);
     }
 }

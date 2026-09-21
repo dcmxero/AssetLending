@@ -1,11 +1,10 @@
+﻿using Application.Abstractions.Persistence;
+using Application.Abstractions.Queries;
 using Application.Mappers;
 using Domain.Common;
 using Domain.Enums;
 using DTOs.Asset;
 using DTOs.Common;
-using Infrastructure.Repositories.AssetManagement;
-using Infrastructure.UnitOfWork;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
@@ -15,26 +14,19 @@ namespace Application.Services;
 /// </summary>
 public sealed class AssetService(
     IAssetRepository assetRepository,
+    IAssetQueries assetQueries,
     IUnitOfWork unitOfWork,
     ILogger<AssetService> logger)
     : IAssetService
 {
     public async Task<PaginatedList<AssetDto>> GetAssetsAsync(AssetStatus? status, int? categoryId, int page, int pageSize, CancellationToken cancellationToken = default)
     {
-        var (items, totalCount) = await assetRepository.GetAssetsAsync(status, categoryId, page, pageSize, cancellationToken);
-        return new PaginatedList<AssetDto>
-        {
-            Data = [.. items.Select(a => a.ToDto())],
-            TotalCount = totalCount,
-            PageIndex = page,
-            PageSize = pageSize
-        };
+        return await assetQueries.GetAssetsAsync(status, categoryId, page, pageSize, cancellationToken);
     }
 
     public async Task<AssetDto?> GetAssetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var asset = await assetRepository.GetByIdAsync(id, cancellationToken);
-        return asset?.ToDto();
+        return await assetQueries.GetAssetByIdAsync(id, cancellationToken);
     }
 
     public async Task<AssetDto> CreateAssetAsync(CreateAssetDto dto, CancellationToken cancellationToken = default)
@@ -45,7 +37,7 @@ public sealed class AssetService(
 
         logger.LogInformation("Created asset '{AssetName}' with ID {AssetId}", asset.Name, asset.Id);
 
-        return asset.ToDto();
+        return await ReadBackAsync(asset.Id, cancellationToken);
     }
 
     public async Task<Result<AssetDto>> UpdateAssetAsync(int id, UpdateAssetDto dto, CancellationToken cancellationToken = default)
@@ -65,7 +57,7 @@ public sealed class AssetService(
         {
             await unitOfWork.CompleteAsync(cancellationToken);
         }
-        catch (DbUpdateConcurrencyException)
+        catch (ConcurrencyConflictException)
         {
             logger.LogWarning("Concurrency conflict updating asset {AssetId}", id);
             return Result.Failure<AssetDto>("The asset was modified by another user. Please try again.");
@@ -73,7 +65,7 @@ public sealed class AssetService(
 
         logger.LogInformation("Updated asset '{AssetName}' with ID {AssetId}", asset.Name, asset.Id);
 
-        return Result.Success(asset.ToDto());
+        return Result.Success(await ReadBackAsync(asset.Id, cancellationToken));
     }
 
     public async Task<Result<AssetDto>> DeactivateAssetAsync(int id, CancellationToken cancellationToken = default)
@@ -95,7 +87,7 @@ public sealed class AssetService(
         {
             await unitOfWork.CompleteAsync(cancellationToken);
         }
-        catch (DbUpdateConcurrencyException)
+        catch (ConcurrencyConflictException)
         {
             logger.LogWarning("Concurrency conflict deactivating asset {AssetId}", id);
             return Result.Failure<AssetDto>("The asset was modified by another user. Please try again.");
@@ -103,7 +95,7 @@ public sealed class AssetService(
 
         logger.LogInformation("Deactivated asset '{AssetName}' with ID {AssetId}", asset.Name, asset.Id);
 
-        return Result.Success(asset.ToDto());
+        return Result.Success(await ReadBackAsync(asset.Id, cancellationToken));
     }
 
     public async Task<Result<AssetDto>> ActivateAssetAsync(int id, CancellationToken cancellationToken = default)
@@ -125,7 +117,7 @@ public sealed class AssetService(
         {
             await unitOfWork.CompleteAsync(cancellationToken);
         }
-        catch (DbUpdateConcurrencyException)
+        catch (ConcurrencyConflictException)
         {
             logger.LogWarning("Concurrency conflict activating asset {AssetId}", id);
             return Result.Failure<AssetDto>("The asset was modified by another user. Please try again.");
@@ -133,6 +125,15 @@ public sealed class AssetService(
 
         logger.LogInformation("Activated asset '{AssetName}' with ID {AssetId}", asset.Name, asset.Id);
 
-        return Result.Success(asset.ToDto());
+        return Result.Success(await ReadBackAsync(asset.Id, cancellationToken));
+    }
+
+    /// <summary>
+    /// Reads a written asset back through the query side so the response carries its persisted category name.
+    /// </summary>
+    private async Task<AssetDto> ReadBackAsync(int id, CancellationToken cancellationToken)
+    {
+        var asset = await assetQueries.GetAssetByIdAsync(id, cancellationToken);
+        return asset ?? throw new InvalidOperationException($"Asset with ID {id} disappeared after being saved.");
     }
 }
