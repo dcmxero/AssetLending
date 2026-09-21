@@ -137,10 +137,10 @@ The project follows **Clean Architecture** with **DDD** principles:
 Server/
 ├── Domain          Pure domain model — entities, enums, business rules (no dependencies)
 ├── DTOs            Data Transfer Objects shared across layers
-├── Application     Application services, mappers (refs: Domain, DTOs, Infrastructure)
-├── Infrastructure  EF Core DbContext, repositories, Unit of Work, seeds (refs: Domain, DTOs)
+├── Application     Services, mappers, persistence and query contracts (refs: Domain, DTOs)
+├── Infrastructure  EF Core DbContext, repositories, queries, Unit of Work, seeds (refs: Application, Domain, DTOs)
 ├── WebApi          ASP.NET Core Web API — controllers, DI, Swagger (refs: Application, Infrastructure, DTOs)
-└── WebApi.Tests    Unit tests (xUnit + Moq)
+└── WebApi.Tests    Domain, controller, query, integration and architecture tests
 ClientAngular/      Angular SPA (standalone components, routing)
 ClientReact/        React SPA (Vite, React Router, TanStack Query)
 ```
@@ -150,11 +150,18 @@ toolchains and are not part of the MSBuild build — open them as folders, not t
 See the IDE note under Prerequisites for the Visual Studio version the solution requires.
 
 **Key patterns:**
-- **Repository pattern** — generic base + specialized repositories
-- **Unit of Work** — wraps `DbContext.SaveChangesAsync()` for atomic operations
+- **Read/write split** — writes go through repositories that return aggregates, reads go through
+  queries that project straight to DTOs (see the Architecture Decisions table for the reasoning)
+- **Repository pattern** — one interface per aggregate, holding only the operations that aggregate
+  supports; no generic base class
+- **Unit of Work** — the application layer's only route to persistence, and the boundary where
+  provider-specific failures are translated into `ConcurrencyConflictException`
+- **Dependency inversion** — `Application/Abstractions` owns the contracts, `Infrastructure`
+  implements them; architecture tests fail the build if the direction is reversed
 - **Result pattern** — explicit success/failure returns instead of exceptions for business rule violations
 - **DDD domain methods** — entities guard their own invariants (e.g., `Asset.Checkout()` returns failure if not available)
-- **Manual mappers** — extension methods for entity <-> DTO conversion
+- **Manual mappers** — extension methods used on the write path, where the entity is already in
+  memory; the read path projects to DTOs in the query instead
 - **Optimistic concurrency** — RowVersion on Asset entity prevents simultaneous conflicting operations
 - **Global exception handler** — middleware catches unhandled exceptions and returns standardized error responses
 
@@ -239,6 +246,9 @@ See the IDE note under Prerequisites for the Visual Studio version the solution 
 | **Soft delete** | IsActive flag | Hard-deleting assets would break FK integrity on historical loans. Deactivation preserves audit trail while hiding the asset from active operations. |
 | **Enum storage** | String conversion | Storing enums as strings (`"Available"`, `"Loaned"`) instead of integers makes the database human-readable and query-debuggable at negligible storage cost. |
 | **ID type** | int (auto-increment) | Simpler than GUIDs for a single-database system. No clustered index fragmentation, smaller FK footprint, easier to reference in conversations and debugging. |
+| **Data access** | Split reads from writes | Entity Framework Core already is a repository and a unit of work, so a second layer that forwards `GetById` and `Add` adds indirection without abstraction. The split keeps the part that pays for itself and drops the part that does not. Writes load whole aggregates, because `Asset.Checkout()` and `Loan.MarkReturned()` need an entity to guard their invariants. Reads never construct an aggregate, so they project to DTOs inside the SQL query and fetch only the columns the response contains. |
+| **Query placement** | Same project as the repositories | A separate `Infrastructure.Queries` project would still have to reference the project holding `ApplicationDbContext`, so the boundary would be one-directional and unenforced. Folders plus architecture tests give the same separation without a third project and without complicating `dotnet ef`. Worth revisiting if the read side ever moves to Dapper, a read replica, or a denormalized read model. |
+| **Contract placement** | `Application/Abstractions` | Interfaces that live in the infrastructure project make the application layer depend on infrastructure, which is the dependency the repository pattern exists to remove. With the contracts in the application layer, `Application` compiles without EF Core at all. |
 | **Notification** | Interface + console impl | Defines the contract (`INotificationService`) now so it can be swapped for SMTP/SendGrid in production without touching business logic. Follows the Dependency Inversion Principle. |
 
 ## Frontend
@@ -256,6 +266,7 @@ The Angular SPA provides:
 - Entity Framework Core 10 (SQL Server)
 - Swashbuckle (Swagger/OpenAPI)
 - xUnit + Moq (unit tests)
+- NetArchTest (layer boundary tests)
 
 **Frontend (Angular):**
 - Angular (standalone components)
