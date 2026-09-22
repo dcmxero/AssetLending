@@ -1,4 +1,4 @@
-using Domain.Common;
+﻿using Domain.Common;
 using Domain.Models.Identity;
 
 namespace Domain.Models.AssetManagement;
@@ -32,7 +32,7 @@ public class Reservation
     /// <summary>
     /// Date and time when the reservation was created.
     /// </summary>
-    public DateTime ReservedAt { get; set; } = DateTime.UtcNow;
+    public DateTime ReservedAt { get; set; }
 
     /// <summary>
     /// Date and time until which the reservation is valid.
@@ -45,9 +45,11 @@ public class Reservation
     public bool IsCancelled { get; set; }
 
     /// <summary>
-    /// Indicates whether the reservation has expired (past ReservedUntil date).
+    /// Indicates whether the reservation has expired by the given instant.
     /// </summary>
-    public bool IsExpired => !IsCancelled && ReservedUntil < DateTime.UtcNow;
+    /// <param name="utcNow">The instant to judge the reservation against.</param>
+    /// <returns>True when the reservation is still open and its validity has passed.</returns>
+    public bool IsExpiredAt(DateTime utcNow) => !IsCancelled && ReservedUntil < utcNow;
 
     /// <summary>
     /// Cancels the reservation.

@@ -1,16 +1,19 @@
-using Domain.Models.AssetManagement;
+﻿using Domain.Models.AssetManagement;
 using Xunit;
 
 namespace WebApi.Tests;
 
 public class ReservationTests
 {
+    private static readonly DateTime Now = new(2026, 5, 1, 12, 0, 0, DateTimeKind.Utc);
+
     private static Reservation CreateActiveReservation() => new()
     {
         Id = 1,
         AssetId = 1,
         ReservedById = 1,
-        ReservedUntil = DateTime.UtcNow.AddDays(3),
+        ReservedAt = Now,
+        ReservedUntil = Now.AddDays(3),
         IsCancelled = false
     };
 
@@ -41,5 +44,26 @@ public class ReservationTests
         // Assert
         Assert.False(result.IsSuccess);
         Assert.NotNull(result.Error);
+    }
+
+    [Fact]
+    public void IsExpiredAt_IsFalse_BeforeTheReservationRunsOut()
+    {
+        Assert.False(CreateActiveReservation().IsExpiredAt(Now.AddDays(2)));
+    }
+
+    [Fact]
+    public void IsExpiredAt_IsTrue_OnceTheReservationHasRunOut()
+    {
+        Assert.True(CreateActiveReservation().IsExpiredAt(Now.AddDays(4)));
+    }
+
+    [Fact]
+    public void IsExpiredAt_IsFalse_ForACancelledReservation()
+    {
+        var reservation = CreateActiveReservation();
+        reservation.Cancel();
+
+        Assert.False(reservation.IsExpiredAt(Now.AddDays(4)));
     }
 }
