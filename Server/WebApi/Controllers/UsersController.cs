@@ -1,8 +1,9 @@
-using Application.Services;
+﻿using Application.Services;
 using DTOs.Common;
 using DTOs.User;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using WebApi.Extensions;
 
 namespace WebApi.Controllers;
 
@@ -64,13 +65,14 @@ public class UsersController(IUserService userService)
     [HttpPost]
     [SwaggerOperation(Summary = "Create a new user")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Create([FromBody] CreateUserDto dto, CancellationToken cancellationToken)
     {
         var result = await userService.CreateUserAsync(dto, cancellationToken);
         if (!result.IsSuccess)
         {
-            return Conflict(new ErrorResponse { Error = result.Error! });
+            return result.ToErrorResult();
         }
 
         return CreatedAtAction(nameof(GetById), new { id = result.Value!.Id }, result.Value);

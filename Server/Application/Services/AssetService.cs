@@ -45,7 +45,7 @@ public sealed class AssetService(
         var asset = await assetRepository.GetByIdAsync(id, cancellationToken);
         if (asset is null)
         {
-            return Result.Failure<AssetDto>($"Asset with ID {id} not found.");
+            return Result.NotFound<AssetDto>($"Asset with ID {id} not found.");
         }
 
         asset.Name = dto.Name;
@@ -60,7 +60,7 @@ public sealed class AssetService(
         catch (ConcurrencyConflictException)
         {
             logger.LogWarning("Concurrency conflict updating asset {AssetId}", id);
-            return Result.Failure<AssetDto>("The asset was modified by another user. Please try again.");
+            return Result.ConcurrencyConflict<AssetDto>();
         }
 
         logger.LogInformation("Updated asset '{AssetName}' with ID {AssetId}", asset.Name, asset.Id);
@@ -73,14 +73,14 @@ public sealed class AssetService(
         var asset = await assetRepository.GetByIdAsync(id, cancellationToken);
         if (asset is null)
         {
-            return Result.Failure<AssetDto>($"Asset with ID {id} not found.");
+            return Result.NotFound<AssetDto>($"Asset with ID {id} not found.");
         }
 
         var deactivateResult = asset.Deactivate();
         if (!deactivateResult.IsSuccess)
         {
             logger.LogWarning("Failed to deactivate asset {AssetId}: {Error}", id, deactivateResult.Error);
-            return Result.Failure<AssetDto>(deactivateResult.Error!);
+            return Result.Failure<AssetDto>(deactivateResult);
         }
 
         try
@@ -90,7 +90,7 @@ public sealed class AssetService(
         catch (ConcurrencyConflictException)
         {
             logger.LogWarning("Concurrency conflict deactivating asset {AssetId}", id);
-            return Result.Failure<AssetDto>("The asset was modified by another user. Please try again.");
+            return Result.ConcurrencyConflict<AssetDto>();
         }
 
         logger.LogInformation("Deactivated asset '{AssetName}' with ID {AssetId}", asset.Name, asset.Id);
@@ -103,14 +103,14 @@ public sealed class AssetService(
         var asset = await assetRepository.GetByIdAsync(id, cancellationToken);
         if (asset is null)
         {
-            return Result.Failure<AssetDto>($"Asset with ID {id} not found.");
+            return Result.NotFound<AssetDto>($"Asset with ID {id} not found.");
         }
 
         var activateResult = asset.Activate();
         if (!activateResult.IsSuccess)
         {
             logger.LogWarning("Failed to activate asset {AssetId}: {Error}", id, activateResult.Error);
-            return Result.Failure<AssetDto>(activateResult.Error!);
+            return Result.Failure<AssetDto>(activateResult);
         }
 
         try
@@ -120,7 +120,7 @@ public sealed class AssetService(
         catch (ConcurrencyConflictException)
         {
             logger.LogWarning("Concurrency conflict activating asset {AssetId}", id);
-            return Result.Failure<AssetDto>("The asset was modified by another user. Please try again.");
+            return Result.ConcurrencyConflict<AssetDto>();
         }
 
         logger.LogInformation("Activated asset '{AssetName}' with ID {AssetId}", asset.Name, asset.Id);

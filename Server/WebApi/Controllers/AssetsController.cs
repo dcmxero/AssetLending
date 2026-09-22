@@ -1,9 +1,10 @@
-using Application.Services;
+﻿using Application.Services;
 using Domain.Enums;
 using DTOs.Asset;
 using DTOs.Common;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using WebApi.Extensions;
 
 namespace WebApi.Controllers;
 
@@ -83,19 +84,14 @@ public class AssetsController(IAssetService assetService, ILoanService loanServi
     [HttpPut("{id}")]
     [SwaggerOperation(Summary = "Update an asset")]
     [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateAssetDto dto, CancellationToken cancellationToken)
     {
         var result = await assetService.UpdateAssetAsync(id, dto, cancellationToken);
         if (!result.IsSuccess)
         {
-            if (result.Error!.Contains("not found"))
-            {
-                return NotFound(new ErrorResponse { Error = result.Error! });
-            }
-
-            return Conflict(new ErrorResponse { Error = result.Error! });
+            return result.ToErrorResult();
         }
 
         return Ok(result.Value);
@@ -110,19 +106,14 @@ public class AssetsController(IAssetService assetService, ILoanService loanServi
     [HttpPatch("{id}/deactivate")]
     [SwaggerOperation(Summary = "Deactivate an asset (soft delete)")]
     [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Deactivate(int id, CancellationToken cancellationToken)
     {
         var result = await assetService.DeactivateAssetAsync(id, cancellationToken);
         if (!result.IsSuccess)
         {
-            if (result.Error!.Contains("not found"))
-            {
-                return NotFound(new ErrorResponse { Error = result.Error! });
-            }
-
-            return Conflict(new ErrorResponse { Error = result.Error! });
+            return result.ToErrorResult();
         }
 
         return Ok(result.Value);
@@ -137,19 +128,14 @@ public class AssetsController(IAssetService assetService, ILoanService loanServi
     [HttpPatch("{id}/activate")]
     [SwaggerOperation(Summary = "Activate an asset")]
     [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Activate(int id, CancellationToken cancellationToken)
     {
         var result = await assetService.ActivateAssetAsync(id, cancellationToken);
         if (!result.IsSuccess)
         {
-            if (result.Error!.Contains("not found"))
-            {
-                return NotFound(new ErrorResponse { Error = result.Error! });
-            }
-
-            return Conflict(new ErrorResponse { Error = result.Error! });
+            return result.ToErrorResult();
         }
 
         return Ok(result.Value);

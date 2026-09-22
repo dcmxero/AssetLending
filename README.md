@@ -158,7 +158,9 @@ See the IDE note under Prerequisites for the Visual Studio version the solution 
   provider-specific failures are translated into `ConcurrencyConflictException`
 - **Dependency inversion** — `Application/Abstractions` owns the contracts, `Infrastructure`
   implements them; architecture tests fail the build if the direction is reversed
-- **Result pattern** — explicit success/failure returns instead of exceptions for business rule violations
+- **Result pattern** — explicit success/failure returns instead of exceptions for business rule
+  violations; each failure carries a `ResultErrorKind` so callers branch on the category rather than
+  on the wording of the message
 - **DDD domain methods** — entities guard their own invariants (e.g., `Asset.Checkout()` returns failure if not available)
 - **Manual mappers** — extension methods used on the write path, where the entity is already in
   memory; the read path projects to DTOs in the query instead
@@ -240,6 +242,7 @@ See the IDE note under Prerequisites for the Visual Studio version the solution 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **API style** | Controllers | Better demonstrates layered architecture than Minimal API; each controller maps to an aggregate, making the structure self-documenting. |
+| **Error classification** | Kind on the result | A failure used to carry only a message, so the API layer picked between 404 and 409 by testing whether that message contained the words "not found". Rewording a message would then have changed an endpoint's status code with nothing to catch it. `ResultErrorKind` names the three cases the callers care about — rule violation, missing entity, lost race — and the message goes back to being for humans only. |
 | **Validation flow** | Result pattern | Business rule violations are expected outcomes, not exceptional states. Throwing exceptions for validation is expensive and obscures control flow. `Result<T>` makes success/failure explicit without performance overhead. |
 | **Mapping** | Manual extension methods | AutoMapper introduces runtime reflection and implicit mapping conventions. With 5 entities, explicit `ToDto()` methods are more transparent, have zero runtime cost, and make it immediately clear what gets mapped. |
 | **Concurrency** | RowVersion on Asset | Two users can attempt to checkout the same asset simultaneously. Optimistic concurrency via SQL Server `rowversion` detects conflicts at save time without database-level locks, keeping the system responsive. |
