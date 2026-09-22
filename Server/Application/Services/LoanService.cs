@@ -42,13 +42,13 @@ public sealed class LoanService(
         var asset = await assetRepository.GetByIdAsync(dto.AssetId, cancellationToken);
         if (asset is null)
         {
-            return Result.Failure<LoanDto>($"Asset with ID {dto.AssetId} not found.");
+            return Result.NotFound<LoanDto>($"Asset with ID {dto.AssetId} not found.");
         }
 
         var user = await userRepository.GetByIdAsync(dto.BorrowedById, cancellationToken);
         if (user is null)
         {
-            return Result.Failure<LoanDto>($"User with ID {dto.BorrowedById} not found.");
+            return Result.NotFound<LoanDto>($"User with ID {dto.BorrowedById} not found.");
         }
 
         bool checkedOut = false;
@@ -71,7 +71,7 @@ public sealed class LoanService(
                     if (!fromReservationResult.IsSuccess)
                     {
                         logger.LogWarning("Failed to checkout from reservation for asset {AssetId}: {Error}", dto.AssetId, fromReservationResult.Error);
-                        return Result.Failure<LoanDto>(fromReservationResult.Error!);
+                        return Result.Failure<LoanDto>(fromReservationResult);
                     }
                     reservation.Cancel();
                     checkedOut = true;
@@ -86,7 +86,7 @@ public sealed class LoanService(
             if (!checkoutResult.IsSuccess)
             {
                 logger.LogWarning("Failed to checkout asset {AssetId}: {Error}", dto.AssetId, checkoutResult.Error);
-                return Result.Failure<LoanDto>(checkoutResult.Error!);
+                return Result.Failure<LoanDto>(checkoutResult);
             }
         }
 
@@ -106,7 +106,7 @@ public sealed class LoanService(
         catch (ConcurrencyConflictException)
         {
             logger.LogWarning("Concurrency conflict creating loan for asset {AssetId}", dto.AssetId);
-            return Result.Failure<LoanDto>("The asset was modified by another user. Please try again.");
+            return Result.ConcurrencyConflict<LoanDto>();
         }
 
         loan.Asset = asset;
@@ -122,21 +122,21 @@ public sealed class LoanService(
         var loan = await loanRepository.GetByIdAsync(loanId, cancellationToken);
         if (loan is null)
         {
-            return Result.Failure<LoanDto>($"Loan with ID {loanId} not found.");
+            return Result.NotFound<LoanDto>($"Loan with ID {loanId} not found.");
         }
 
         var returnResult = loan.MarkReturned();
         if (!returnResult.IsSuccess)
         {
             logger.LogWarning("Failed to return loan {LoanId}: {Error}", loanId, returnResult.Error);
-            return Result.Failure<LoanDto>(returnResult.Error!);
+            return Result.Failure<LoanDto>(returnResult);
         }
 
         var assetResult = loan.Asset.Return();
         if (!assetResult.IsSuccess)
         {
             logger.LogWarning("Failed to return asset for loan {LoanId}: {Error}", loanId, assetResult.Error);
-            return Result.Failure<LoanDto>(assetResult.Error!);
+            return Result.Failure<LoanDto>(assetResult);
         }
 
         try
@@ -146,7 +146,7 @@ public sealed class LoanService(
         catch (ConcurrencyConflictException)
         {
             logger.LogWarning("Concurrency conflict returning loan {LoanId}", loanId);
-            return Result.Failure<LoanDto>("The asset was modified by another user. Please try again.");
+            return Result.ConcurrencyConflict<LoanDto>();
         }
 
         logger.LogInformation("Returned loan {LoanId} for asset {AssetId}", loan.Id, loan.AssetId);

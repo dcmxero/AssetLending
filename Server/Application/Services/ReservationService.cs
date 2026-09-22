@@ -1,4 +1,4 @@
-using Application.Abstractions.Persistence;
+﻿using Application.Abstractions.Persistence;
 using Application.Mappers;
 using Domain.Common;
 using Domain.Models.AssetManagement;
@@ -23,13 +23,13 @@ public sealed class ReservationService(
         var asset = await assetRepository.GetByIdAsync(dto.AssetId, cancellationToken);
         if (asset is null)
         {
-            return Result.Failure<ReservationDto>($"Asset with ID {dto.AssetId} not found.");
+            return Result.NotFound<ReservationDto>($"Asset with ID {dto.AssetId} not found.");
         }
 
         var user = await userRepository.GetByIdAsync(dto.ReservedById, cancellationToken);
         if (user is null)
         {
-            return Result.Failure<ReservationDto>($"User with ID {dto.ReservedById} not found.");
+            return Result.NotFound<ReservationDto>($"User with ID {dto.ReservedById} not found.");
         }
 
         // Check for expired reservation and auto-cancel if needed
@@ -48,7 +48,7 @@ public sealed class ReservationService(
         if (!reserveResult.IsSuccess)
         {
             logger.LogWarning("Failed to reserve asset {AssetId}: {Error}", dto.AssetId, reserveResult.Error);
-            return Result.Failure<ReservationDto>(reserveResult.Error!);
+            return Result.Failure<ReservationDto>(reserveResult);
         }
 
         var reservation = new Reservation
@@ -67,7 +67,7 @@ public sealed class ReservationService(
         catch (ConcurrencyConflictException)
         {
             logger.LogWarning("Concurrency conflict creating reservation for asset {AssetId}", dto.AssetId);
-            return Result.Failure<ReservationDto>("The asset was modified by another user. Please try again.");
+            return Result.ConcurrencyConflict<ReservationDto>();
         }
 
         reservation.Asset = asset;
@@ -83,21 +83,21 @@ public sealed class ReservationService(
         var reservation = await reservationRepository.GetByIdAsync(reservationId, cancellationToken);
         if (reservation is null)
         {
-            return Result.Failure<ReservationDto>($"Reservation with ID {reservationId} not found.");
+            return Result.NotFound<ReservationDto>($"Reservation with ID {reservationId} not found.");
         }
 
         var cancelResult = reservation.Cancel();
         if (!cancelResult.IsSuccess)
         {
             logger.LogWarning("Failed to cancel reservation {ReservationId}: {Error}", reservationId, cancelResult.Error);
-            return Result.Failure<ReservationDto>(cancelResult.Error!);
+            return Result.Failure<ReservationDto>(cancelResult);
         }
 
         var assetResult = reservation.Asset.CancelReservation();
         if (!assetResult.IsSuccess)
         {
             logger.LogWarning("Failed to cancel reservation asset {AssetId}: {Error}", reservation.AssetId, assetResult.Error);
-            return Result.Failure<ReservationDto>(assetResult.Error!);
+            return Result.Failure<ReservationDto>(assetResult);
         }
 
         try
@@ -107,7 +107,7 @@ public sealed class ReservationService(
         catch (ConcurrencyConflictException)
         {
             logger.LogWarning("Concurrency conflict cancelling reservation {ReservationId}", reservationId);
-            return Result.Failure<ReservationDto>("The asset was modified by another user. Please try again.");
+            return Result.ConcurrencyConflict<ReservationDto>();
         }
 
         logger.LogInformation("Cancelled reservation {ReservationId} for asset {AssetId}", reservation.Id, reservation.AssetId);
