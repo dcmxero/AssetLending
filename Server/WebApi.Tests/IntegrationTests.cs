@@ -189,6 +189,56 @@ public class IntegrationTests(IntegrationTests.TestFactory factory)
     }
 
     [Fact]
+    public async Task CreatedReservation_IsReachableAtItsLocationHeader()
+    {
+        var category = await CreateCategory("Reservation Read Category");
+        var user = await CreateUser("Read", "Back", "read.back@example.com");
+        var asset = await CreateAsset("Reservation Read Laptop", category.Id);
+
+        var created = await client.PostAsJsonAsync("/api/reservations", new
+        {
+            assetId = asset.Id,
+            reservedById = user.Id,
+            reservedUntil = DateTime.UtcNow.AddDays(3).ToString("o")
+        });
+        created.EnsureSuccessStatusCode();
+
+        var location = created.Headers.Location;
+        Assert.NotNull(location);
+
+        var fetched = await client.GetAsync(location);
+        fetched.EnsureSuccessStatusCode();
+
+        var reservation = await fetched.Content.ReadFromJsonAsync<ReservationDto>();
+        Assert.Equal("Reservation Read Laptop", reservation!.AssetName);
+        Assert.False(reservation.IsCancelled);
+    }
+
+    [Fact]
+    public async Task ActiveReservations_ExcludeCancelledOnes()
+    {
+        var category = await CreateCategory("Reservation List Category");
+        var user = await CreateUser("List", "Reader", "list.reader@example.com");
+        var asset = await CreateAsset("Reservation List Laptop", category.Id);
+
+        var created = await client.PostAsJsonAsync("/api/reservations", new
+        {
+            assetId = asset.Id,
+            reservedById = user.Id,
+            reservedUntil = DateTime.UtcNow.AddDays(3).ToString("o")
+        });
+        var reservation = (await created.Content.ReadFromJsonAsync<ReservationDto>())!;
+
+        var beforeCancel = await client.GetFromJsonAsync<List<ReservationDto>>("/api/reservations/active");
+        Assert.Contains(beforeCancel!, r => r.Id == reservation.Id);
+
+        (await client.PutAsync($"/api/reservations/{reservation.Id}/cancel", null)).EnsureSuccessStatusCode();
+
+        var afterCancel = await client.GetFromJsonAsync<List<ReservationDto>>("/api/reservations/active");
+        Assert.DoesNotContain(afterCancel!, r => r.Id == reservation.Id);
+    }
+
+    [Fact]
     public async Task Statistics_ReturnsValidData()
     {
         var response = await client.GetAsync("/api/statistics");

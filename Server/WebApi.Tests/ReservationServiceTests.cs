@@ -1,4 +1,5 @@
-using Application.Abstractions.Persistence;
+﻿using Application.Abstractions.Persistence;
+using Application.Abstractions.Queries;
 using Application.Services;
 using Domain.Common;
 using Domain.Enums;
@@ -31,6 +32,7 @@ public class ReservationServiceTests
 
     private ReservationService CreateService() => new(
         reservations.Object,
+        Mock.Of<IReservationQueries>(),
         assets.Object,
         users.Object,
         unitOfWork.Object,

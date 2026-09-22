@@ -223,6 +223,7 @@ See the IDE note under Prerequisites for the Visual Studio version the solution 
 | Method | Route | Description |
 |--------|-------|-------------|
 | GET | `/api/loans?page=1&pageSize=10` | List all loans (paginated) |
+| GET | `/api/loans/{id}` | Get a loan by ID |
 | GET | `/api/loans/active` | List all active loans |
 | GET | `/api/loans/overdue` | List overdue loans (active, past due date) |
 | POST | `/api/loans` | Checkout an asset (create loan) |
@@ -231,6 +232,9 @@ See the IDE note under Prerequisites for the Visual Studio version the solution 
 ### Reservations
 | Method | Route | Description |
 |--------|-------|-------------|
+| GET | `/api/reservations?page=1&pageSize=10` | List all reservations (paginated, includes cancelled) |
+| GET | `/api/reservations/active` | List reservations that are neither cancelled nor run out |
+| GET | `/api/reservations/{id}` | Get a reservation by ID |
 | POST | `/api/reservations` | Reserve an asset |
 | PUT | `/api/reservations/{id}/cancel` | Cancel a reservation |
 

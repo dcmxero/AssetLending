@@ -27,6 +27,14 @@ public sealed class LoanQueries(ApplicationDbContext context, TimeProvider timeP
         Status = loan.Status.ToString()
     };
 
+    public async Task<LoanDto?> GetLoanByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await context.Loans
+            .Where(l => l.Id == id)
+            .Select(ToDto)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<List<LoanDto>> GetActiveLoansAsync(CancellationToken cancellationToken = default)
     {
         return await context.Loans

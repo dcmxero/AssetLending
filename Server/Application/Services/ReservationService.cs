@@ -1,8 +1,10 @@
 ﻿using Application.Abstractions.Persistence;
+using Application.Abstractions.Queries;
 using Application.Mappers;
 using Domain.Common;
 using Domain.Models.AssetManagement;
 using DTOs.Asset;
+using DTOs.Common;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
@@ -12,6 +14,7 @@ namespace Application.Services;
 /// </summary>
 public sealed class ReservationService(
     IReservationRepository reservationRepository,
+    IReservationQueries reservationQueries,
     IAssetRepository assetRepository,
     IUserRepository userRepository,
     IUnitOfWork unitOfWork,
@@ -19,6 +22,21 @@ public sealed class ReservationService(
     ILogger<ReservationService> logger)
     : IReservationService
 {
+    public async Task<List<ReservationDto>> GetActiveReservationsAsync(CancellationToken cancellationToken = default)
+    {
+        return await reservationQueries.GetActiveReservationsAsync(cancellationToken);
+    }
+
+    public async Task<PaginatedList<ReservationDto>> GetAllReservationsAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+    {
+        return await reservationQueries.GetAllReservationsAsync(page, pageSize, cancellationToken);
+    }
+
+    public async Task<ReservationDto?> GetReservationByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await reservationQueries.GetReservationByIdAsync(id, cancellationToken);
+    }
+
     public async Task<Result<ReservationDto>> CreateReservationAsync(CreateReservationDto dto, CancellationToken cancellationToken = default)
     {
         var now = timeProvider.GetUtcNow().UtcDateTime;

@@ -34,6 +34,7 @@ builder.Services.AddScoped<IAssetCategoryRepository, AssetCategoryRepository>();
 builder.Services.AddScoped<IAssetQueries, AssetQueries>();
 builder.Services.AddScoped<IAssetCategoryQueries, AssetCategoryQueries>();
 builder.Services.AddScoped<ILoanQueries, LoanQueries>();
+builder.Services.AddScoped<IReservationQueries, ReservationQueries>();
 builder.Services.AddScoped<IStatisticsQueries, StatisticsQueries>();
 builder.Services.AddScoped<IUserQueries, UserQueries>();
 
