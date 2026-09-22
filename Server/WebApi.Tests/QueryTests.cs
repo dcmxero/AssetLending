@@ -134,6 +134,57 @@ public class QueryTests
 
     #endregion
 
+    #region Reservations
+
+    [Fact]
+    public async Task GetActiveReservations_ExcludesCancelledAndExpiredOnes()
+    {
+        var reservations = await new ReservationQueries(context, clock).GetActiveReservationsAsync();
+
+        var reservation = Assert.Single(reservations);
+        Assert.Equal("Impact Drill", reservation.AssetName);
+        Assert.Equal("Adam Novy", reservation.ReservedByName);
+        Assert.False(reservation.IsExpired);
+    }
+
+    [Fact]
+    public async Task GetActiveReservations_DropsAReservationOnceItRunsOut()
+    {
+        clock.Advance(TimeSpan.FromDays(6));
+
+        Assert.Empty(await new ReservationQueries(context, clock).GetActiveReservationsAsync());
+    }
+
+    [Fact]
+    public async Task GetAllReservations_IncludesCancelledOnes()
+    {
+        var page = await new ReservationQueries(context, clock).GetAllReservationsAsync(1, 10);
+
+        Assert.Equal(2, page.TotalCount);
+        Assert.Contains(page.Data, r => r.IsCancelled);
+    }
+
+    [Fact]
+    public async Task GetReservationById_ReportsExpiryAgainstTheCurrentInstant()
+    {
+        var queries = new ReservationQueries(context, clock);
+        var id = context.Reservations.Single(r => !r.IsCancelled).Id;
+
+        Assert.False((await queries.GetReservationByIdAsync(id))!.IsExpired);
+
+        clock.Advance(TimeSpan.FromDays(6));
+
+        Assert.True((await new ReservationQueries(context, clock).GetReservationByIdAsync(id))!.IsExpired);
+    }
+
+    [Fact]
+    public async Task GetReservationById_ReturnsNullWhenMissing()
+    {
+        Assert.Null(await new ReservationQueries(context, clock).GetReservationByIdAsync(9999));
+    }
+
+    #endregion
+
     #region Users and categories
 
     [Fact]
@@ -163,6 +214,7 @@ public class QueryTests
         await new LoanQueries(context, clock).GetAllLoansAsync(1, 10);
         await new UserQueries(context).GetUsersAsync(1, 10);
         await new AssetCategoryQueries(context).GetAllCategoriesAsync();
+        await new ReservationQueries(context, clock).GetAllReservationsAsync(1, 10);
 
         Assert.Empty(context.ChangeTracker.Entries());
     }
@@ -201,6 +253,23 @@ public class QueryTests
                 DueDate = now.AddDays(-2),
                 ReturnedAt = now.AddDays(-3),
                 Status = LoanStatus.Returned
+            });
+
+        context.Reservations.AddRange(
+            new Reservation
+            {
+                Asset = drill,
+                ReservedBy = adam,
+                ReservedAt = now,
+                ReservedUntil = now.AddDays(5)
+            },
+            new Reservation
+            {
+                Asset = dock,
+                ReservedBy = jana,
+                ReservedAt = now.AddDays(-4),
+                ReservedUntil = now.AddDays(3),
+                IsCancelled = true
             });
 
         context.SaveChanges();
