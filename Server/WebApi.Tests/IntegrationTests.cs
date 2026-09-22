@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using DTOs.Asset;
+using DTOs.Common;
 using DTOs.User;
 using Infrastructure;
 using Microsoft.AspNetCore.Hosting;
@@ -236,6 +237,29 @@ public class IntegrationTests(IntegrationTests.TestFactory factory)
 
         var afterCancel = await client.GetFromJsonAsync<List<ReservationDto>>("/api/reservations/active");
         Assert.DoesNotContain(afterCancel!, r => r.Id == reservation.Id);
+    }
+
+    [Fact]
+    public async Task Paging_IsBoundFromTheQueryString()
+    {
+        var category = await CreateCategory("Paging Category");
+        await CreateAsset("Paging Alpha", category.Id);
+        await CreateAsset("Paging Beta", category.Id);
+
+        var page = await client.GetFromJsonAsync<PaginatedList<AssetDto>>("/api/assets?page=2&pageSize=1");
+
+        Assert.Equal(2, page!.PageIndex);
+        Assert.Equal(1, page.PageSize);
+        Assert.Single(page.Data);
+    }
+
+    [Fact]
+    public async Task Paging_ClampsValuesOutsideTheSupportedRange()
+    {
+        var page = await client.GetFromJsonAsync<PaginatedList<AssetDto>>("/api/assets?page=0&pageSize=5000");
+
+        Assert.Equal(1, page!.PageIndex);
+        Assert.Equal(PageRequest.MaxPageSize, page.PageSize);
     }
 
     [Fact]

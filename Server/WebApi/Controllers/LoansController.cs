@@ -18,20 +18,15 @@ public class LoansController(ILoanService loanService)
     /// <summary>
     /// Retrieves a paginated list of all loans.
     /// </summary>
-    /// <param name="page">The page number (1-based). Defaults to 1.</param>
-    /// <param name="pageSize">The number of items per page. Defaults to 10.</param>
+    /// <param name="paging">Page number and page size.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A paginated list of all loans.</returns>
     [HttpGet]
     [SwaggerOperation(Summary = "Get all loans (paginated)")]
     [ProducesResponseType(typeof(PaginatedList<LoanDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAll(int page = 1, int pageSize = 10, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAll([FromQuery] PageRequest paging, CancellationToken cancellationToken = default)
     {
-        if (page < 1) { page = 1; }
-        if (pageSize < 1) { pageSize = 10; }
-        if (pageSize > 100) { pageSize = 100; }
-
-        var loans = await loanService.GetAllLoansAsync(page, pageSize, cancellationToken);
+        var loans = await loanService.GetAllLoansAsync(paging.Page, paging.PageSize, cancellationToken);
         return Ok(loans);
     }
 

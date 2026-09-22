@@ -18,20 +18,15 @@ public class ReservationsController(IReservationService reservationService)
     /// <summary>
     /// Retrieves a paginated list of all reservations, newest first.
     /// </summary>
-    /// <param name="page">The page number (1-based). Defaults to 1.</param>
-    /// <param name="pageSize">The number of items per page. Defaults to 10.</param>
+    /// <param name="paging">Page number and page size.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A paginated list of reservations.</returns>
     [HttpGet]
     [SwaggerOperation(Summary = "Get all reservations (paginated)")]
     [ProducesResponseType(typeof(PaginatedList<ReservationDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAll(int page = 1, int pageSize = 10, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAll([FromQuery] PageRequest paging, CancellationToken cancellationToken = default)
     {
-        if (page < 1) { page = 1; }
-        if (pageSize < 1) { pageSize = 10; }
-        if (pageSize > 100) { pageSize = 100; }
-
-        var reservations = await reservationService.GetAllReservationsAsync(page, pageSize, cancellationToken);
+        var reservations = await reservationService.GetAllReservationsAsync(paging.Page, paging.PageSize, cancellationToken);
         return Ok(reservations);
     }
 
