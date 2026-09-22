@@ -1,4 +1,4 @@
-using Application.Abstractions.Queries;
+﻿using Application.Abstractions.Queries;
 using Domain.Enums;
 using Domain.Models.AssetManagement;
 using DTOs.Asset;
@@ -11,7 +11,7 @@ namespace Infrastructure.Queries;
 /// <summary>
 /// Reads loan data and projects it into DTOs within the database query.
 /// </summary>
-public sealed class LoanQueries(ApplicationDbContext context)
+public sealed class LoanQueries(ApplicationDbContext context, TimeProvider timeProvider)
     : ILoanQueries
 {
     private static readonly Expression<Func<Loan, LoanDto>> ToDto = loan => new LoanDto
@@ -37,8 +37,10 @@ public sealed class LoanQueries(ApplicationDbContext context)
 
     public async Task<List<LoanDto>> GetOverdueLoansAsync(CancellationToken cancellationToken = default)
     {
+        var now = timeProvider.GetUtcNow().UtcDateTime;
+
         return await context.Loans
-            .Where(l => l.Status == LoanStatus.Active && l.DueDate < DateTime.UtcNow)
+            .Where(l => l.Status == LoanStatus.Active && l.DueDate < now)
             .Select(ToDto)
             .ToListAsync(cancellationToken);
     }

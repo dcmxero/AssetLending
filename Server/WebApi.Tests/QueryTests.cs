@@ -1,9 +1,10 @@
-using Domain.Enums;
+﻿using Domain.Enums;
 using Domain.Models.AssetManagement;
 using Domain.Models.Identity;
 using Infrastructure;
 using Infrastructure.Queries;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Time.Testing;
 using Xunit;
 
 namespace WebApi.Tests;
@@ -15,6 +16,7 @@ public class QueryTests
     : IDisposable
 {
     private readonly ApplicationDbContext context;
+    private readonly FakeTimeProvider clock = new(new DateTimeOffset(2026, 5, 1, 12, 0, 0, TimeSpan.Zero));
 
     public QueryTests()
     {
@@ -92,7 +94,7 @@ public class QueryTests
     [Fact]
     public async Task GetActiveLoans_ProjectsAssetAndBorrowerNames()
     {
-        var loans = await new LoanQueries(context).GetActiveLoansAsync();
+        var loans = await new LoanQueries(context, clock).GetActiveLoansAsync();
 
         var loan = Assert.Single(loans);
         Assert.Equal("ThinkPad", loan.AssetName);
@@ -103,21 +105,17 @@ public class QueryTests
     [Fact]
     public async Task GetOverdueLoans_ReturnsOnlyActiveLoansPastTheirDueDate()
     {
-        var overdue = await new LoanQueries(context).GetOverdueLoansAsync();
+        Assert.Empty(await new LoanQueries(context, clock).GetOverdueLoansAsync());
 
-        Assert.Empty(overdue);
+        clock.Advance(TimeSpan.FromDays(10));
 
-        var loan = context.Loans.Single(l => l.Status == LoanStatus.Active);
-        loan.DueDate = DateTime.UtcNow.AddDays(-1);
-        await context.SaveChangesAsync();
-
-        Assert.Single(await new LoanQueries(context).GetOverdueLoansAsync());
+        Assert.Single(await new LoanQueries(context, clock).GetOverdueLoansAsync());
     }
 
     [Fact]
     public async Task GetAllLoans_OrdersNewestFirst()
     {
-        var page = await new LoanQueries(context).GetAllLoansAsync(1, 10);
+        var page = await new LoanQueries(context, clock).GetAllLoansAsync(1, 10);
 
         Assert.Equal(2, page.TotalCount);
         Assert.True(page.Data[0].BorrowedAt >= page.Data[1].BorrowedAt);
@@ -128,7 +126,7 @@ public class QueryTests
     {
         var thinkPad = context.Assets.Single(a => a.Name == "ThinkPad");
 
-        var page = await new LoanQueries(context).GetLoansByAssetIdAsync(thinkPad.Id, 1, 10);
+        var page = await new LoanQueries(context, clock).GetLoansByAssetIdAsync(thinkPad.Id, 1, 10);
 
         Assert.Equal(2, page.TotalCount);
         Assert.All(page.Data, l => Assert.Equal(thinkPad.Id, l.AssetId));
@@ -162,7 +160,7 @@ public class QueryTests
         context.ChangeTracker.Clear();
 
         await new AssetQueries(context).GetAssetsAsync(null, null, 1, 10);
-        await new LoanQueries(context).GetAllLoansAsync(1, 10);
+        await new LoanQueries(context, clock).GetAllLoansAsync(1, 10);
         await new UserQueries(context).GetUsersAsync(1, 10);
         await new AssetCategoryQueries(context).GetAllCategoriesAsync();
 
@@ -171,6 +169,8 @@ public class QueryTests
 
     private void Seed()
     {
+        var now = clock.GetUtcNow().UtcDateTime;
+
         var electronics = new AssetCategory { Name = "Electronics" };
         var tools = new AssetCategory { Name = "Tools" };
         context.AssetCategories.AddRange(electronics, tools);
@@ -190,16 +190,16 @@ public class QueryTests
             {
                 Asset = thinkPad,
                 BorrowedBy = jana,
-                BorrowedAt = DateTime.UtcNow.AddDays(-2),
-                DueDate = DateTime.UtcNow.AddDays(5)
+                BorrowedAt = now.AddDays(-2),
+                DueDate = now.AddDays(5)
             },
             new Loan
             {
                 Asset = thinkPad,
                 BorrowedBy = adam,
-                BorrowedAt = DateTime.UtcNow.AddDays(-9),
-                DueDate = DateTime.UtcNow.AddDays(-2),
-                ReturnedAt = DateTime.UtcNow.AddDays(-3),
+                BorrowedAt = now.AddDays(-9),
+                DueDate = now.AddDays(-2),
+                ReturnedAt = now.AddDays(-3),
                 Status = LoanStatus.Returned
             });
 

@@ -1,4 +1,4 @@
-using Application.Abstractions.Queries;
+﻿using Application.Abstractions.Queries;
 using Domain.Enums;
 using DTOs.Common;
 using Microsoft.EntityFrameworkCore;
@@ -8,16 +8,18 @@ namespace Infrastructure.Queries;
 /// <summary>
 /// Computes aggregated lending system statistics directly against the database.
 /// </summary>
-public sealed class StatisticsQueries(ApplicationDbContext context)
+public sealed class StatisticsQueries(ApplicationDbContext context, TimeProvider timeProvider)
     : IStatisticsQueries
 {
     public async Task<StatisticsDto> GetStatisticsAsync(CancellationToken cancellationToken = default)
     {
+        var now = timeProvider.GetUtcNow().UtcDateTime;
+
         var totalAssets = await context.Assets.CountAsync(a => a.IsActive, cancellationToken);
         var totalUsers = await context.Users.CountAsync(cancellationToken);
         var activeLoans = await context.Loans.CountAsync(l => l.Status == LoanStatus.Active, cancellationToken);
-        var overdueLoans = await context.Loans.CountAsync(l => l.Status == LoanStatus.Active && l.DueDate < DateTime.UtcNow, cancellationToken);
-        var activeReservations = await context.Reservations.CountAsync(r => !r.IsCancelled && r.ReservedUntil >= DateTime.UtcNow, cancellationToken);
+        var overdueLoans = await context.Loans.CountAsync(l => l.Status == LoanStatus.Active && l.DueDate < now, cancellationToken);
+        var activeReservations = await context.Reservations.CountAsync(r => !r.IsCancelled && r.ReservedUntil >= now, cancellationToken);
 
         var mostBorrowedAsset = await context.Loans
             .GroupBy(l => l.AssetId)
