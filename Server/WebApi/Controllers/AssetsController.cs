@@ -21,20 +21,15 @@ public class AssetsController(IAssetService assetService, ILoanService loanServi
     /// </summary>
     /// <param name="status">Optional status filter (Available, Loaned, Reserved).</param>
     /// <param name="categoryId">Optional category filter.</param>
-    /// <param name="page">The page number (1-based). Defaults to 1.</param>
-    /// <param name="pageSize">The number of items per page. Defaults to 10.</param>
+    /// <param name="paging">Page number and page size.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A paginated list of assets.</returns>
     [HttpGet]
     [SwaggerOperation(Summary = "Get all assets (paginated, with optional status and category filter)")]
     [ProducesResponseType(typeof(PaginatedList<AssetDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAll(AssetStatus? status, int? categoryId, int page = 1, int pageSize = 10, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAll(AssetStatus? status, int? categoryId, [FromQuery] PageRequest paging, CancellationToken cancellationToken = default)
     {
-        if (page < 1) { page = 1; }
-        if (pageSize < 1) { pageSize = 10; }
-        if (pageSize > 100) { pageSize = 100; }
-
-        var assets = await assetService.GetAssetsAsync(status, categoryId, page, pageSize, cancellationToken);
+        var assets = await assetService.GetAssetsAsync(status, categoryId, paging.Page, paging.PageSize, cancellationToken);
         return Ok(assets);
     }
 
@@ -145,20 +140,15 @@ public class AssetsController(IAssetService assetService, ILoanService loanServi
     /// Retrieves a paginated loan history for a specific asset.
     /// </summary>
     /// <param name="id">The asset identifier.</param>
-    /// <param name="page">The page number (1-based). Defaults to 1.</param>
-    /// <param name="pageSize">The number of items per page. Defaults to 10.</param>
+    /// <param name="paging">Page number and page size.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A paginated list of loans for the asset.</returns>
     [HttpGet("{id}/loans")]
     [SwaggerOperation(Summary = "Get loan history for an asset")]
     [ProducesResponseType(typeof(PaginatedList<LoanDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetLoanHistory(int id, int page = 1, int pageSize = 10, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetLoanHistory(int id, [FromQuery] PageRequest paging, CancellationToken cancellationToken = default)
     {
-        if (page < 1) { page = 1; }
-        if (pageSize < 1) { pageSize = 10; }
-        if (pageSize > 100) { pageSize = 100; }
-
-        var loans = await loanService.GetLoansByAssetIdAsync(id, page, pageSize, cancellationToken);
+        var loans = await loanService.GetLoansByAssetIdAsync(id, paging.Page, paging.PageSize, cancellationToken);
         return Ok(loans);
     }
 }

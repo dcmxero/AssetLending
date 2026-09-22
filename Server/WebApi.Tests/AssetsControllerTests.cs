@@ -39,7 +39,7 @@ public class AssetsControllerTests
         mockAssetService.Setup(s => s.GetAssetsAsync(null, null, 1, 10, default)).ReturnsAsync(paginatedList);
 
         // Act
-        IActionResult result = await controller.GetAll(null, null, 1, 10, default);
+        IActionResult result = await controller.GetAll(null, null, new PageRequest(), default);
 
         // Assert
         OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
