@@ -23,6 +23,11 @@ public sealed class LoanService(
     ILogger<LoanService> logger)
     : ILoanService
 {
+    public async Task<LoanDto?> GetLoanByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await loanQueries.GetLoanByIdAsync(id, cancellationToken);
+    }
+
     public async Task<List<LoanDto>> GetActiveLoansAsync(CancellationToken cancellationToken = default)
     {
         return await loanQueries.GetActiveLoansAsync(cancellationToken);

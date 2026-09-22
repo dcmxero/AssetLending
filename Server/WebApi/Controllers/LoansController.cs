@@ -36,6 +36,27 @@ public class LoansController(ILoanService loanService)
     }
 
     /// <summary>
+    /// Retrieves a loan by its identifier.
+    /// </summary>
+    /// <param name="id">The loan identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The loan if found; otherwise, 404.</returns>
+    [HttpGet("{id}")]
+    [SwaggerOperation(Summary = "Get loan by ID")]
+    [ProducesResponseType(typeof(LoanDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
+    {
+        var loan = await loanService.GetLoanByIdAsync(id, cancellationToken);
+        if (loan is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(loan);
+    }
+
+    /// <summary>
     /// Retrieves all currently active loans with asset and user details.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token.</param>
@@ -82,7 +103,7 @@ public class LoansController(ILoanService loanService)
             return result.ToErrorResult();
         }
 
-        return CreatedAtAction(null, new { id = result.Value!.Id }, result.Value);
+        return CreatedAtAction(nameof(GetById), new { id = result.Value!.Id }, result.Value);
     }
 
     /// <summary>

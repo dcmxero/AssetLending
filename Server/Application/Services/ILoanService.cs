@@ -1,4 +1,4 @@
-using Domain.Common;
+﻿using Domain.Common;
 using DTOs.Asset;
 using DTOs.Common;
 
@@ -9,6 +9,14 @@ namespace Application.Services;
 /// </summary>
 public interface ILoanService
 {
+    /// <summary>
+    /// Retrieves a loan by its identifier.
+    /// </summary>
+    /// <param name="id">The loan identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The loan if found; otherwise, null.</returns>
+    Task<LoanDto?> GetLoanByIdAsync(int id, CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Retrieves all currently active loans.
     /// </summary>

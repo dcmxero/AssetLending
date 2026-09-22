@@ -1,4 +1,4 @@
-using DTOs.Asset;
+﻿using DTOs.Asset;
 using DTOs.Common;
 
 namespace Application.Abstractions.Queries;
@@ -8,6 +8,14 @@ namespace Application.Abstractions.Queries;
 /// </summary>
 public interface ILoanQueries
 {
+    /// <summary>
+    /// Retrieves a single loan by its identifier.
+    /// </summary>
+    /// <param name="id">The identifier of the loan.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The loan if found; otherwise, null.</returns>
+    Task<LoanDto?> GetLoanByIdAsync(int id, CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Retrieves all loans that are currently active.
     /// </summary>
