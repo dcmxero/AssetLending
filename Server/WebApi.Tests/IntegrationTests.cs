@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Json;
 using DTOs.Asset;
 using DTOs.User;
@@ -163,6 +163,29 @@ public class IntegrationTests(IntegrationTests.TestFactory factory)
         });
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task CreateLoan_ForMissingAsset_ReturnsNotFound()
+    {
+        var user = await CreateUser("Missing", "Asset", "missing.asset@example.com");
+
+        var response = await client.PostAsJsonAsync("/api/loans", new
+        {
+            assetId = 999999,
+            borrowedById = user.Id,
+            dueDate = DateTime.UtcNow.AddDays(7).ToString("o")
+        });
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task CancelReservation_ForMissingReservation_ReturnsNotFound()
+    {
+        var response = await client.PutAsync("/api/reservations/999999/cancel", null);
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]

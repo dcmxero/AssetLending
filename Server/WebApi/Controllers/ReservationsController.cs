@@ -1,8 +1,9 @@
-using Application.Services;
+﻿using Application.Services;
 using DTOs.Asset;
 using DTOs.Common;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using WebApi.Extensions;
 
 namespace WebApi.Controllers;
 
@@ -23,13 +24,14 @@ public class ReservationsController(IReservationService reservationService)
     [HttpPost]
     [SwaggerOperation(Summary = "Create a reservation for an asset")]
     [ProducesResponseType(typeof(ReservationDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Create([FromBody] CreateReservationDto dto, CancellationToken cancellationToken)
     {
         var result = await reservationService.CreateReservationAsync(dto, cancellationToken);
         if (!result.IsSuccess)
         {
-            return Conflict(new ErrorResponse { Error = result.Error! });
+            return result.ToErrorResult();
         }
 
         return CreatedAtAction(null, new { id = result.Value!.Id }, result.Value);
@@ -44,13 +46,14 @@ public class ReservationsController(IReservationService reservationService)
     [HttpPut("{id}/cancel")]
     [SwaggerOperation(Summary = "Cancel a reservation")]
     [ProducesResponseType(typeof(ReservationDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Cancel(int id, CancellationToken cancellationToken)
     {
         var result = await reservationService.CancelReservationAsync(id, cancellationToken);
         if (!result.IsSuccess)
         {
-            return Conflict(new ErrorResponse { Error = result.Error! });
+            return result.ToErrorResult();
         }
 
         return Ok(result.Value);

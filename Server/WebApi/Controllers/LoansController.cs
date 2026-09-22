@@ -1,8 +1,9 @@
-using Application.Services;
+﻿using Application.Services;
 using DTOs.Asset;
 using DTOs.Common;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using WebApi.Extensions;
 
 namespace WebApi.Controllers;
 
@@ -71,13 +72,14 @@ public class LoansController(ILoanService loanService)
     [HttpPost]
     [SwaggerOperation(Summary = "Create a loan (checkout an asset)")]
     [ProducesResponseType(typeof(LoanDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Create([FromBody] CreateLoanDto dto, CancellationToken cancellationToken)
     {
         var result = await loanService.CreateLoanAsync(dto, cancellationToken);
         if (!result.IsSuccess)
         {
-            return Conflict(new ErrorResponse { Error = result.Error! });
+            return result.ToErrorResult();
         }
 
         return CreatedAtAction(null, new { id = result.Value!.Id }, result.Value);
@@ -92,13 +94,14 @@ public class LoansController(ILoanService loanService)
     [HttpPut("{id}/return")]
     [SwaggerOperation(Summary = "Return a loaned asset")]
     [ProducesResponseType(typeof(LoanDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> ReturnAsset(int id, CancellationToken cancellationToken)
     {
         var result = await loanService.ReturnAssetAsync(id, cancellationToken);
         if (!result.IsSuccess)
         {
-            return Conflict(new ErrorResponse { Error = result.Error! });
+            return result.ToErrorResult();
         }
 
         return Ok(result.Value);
