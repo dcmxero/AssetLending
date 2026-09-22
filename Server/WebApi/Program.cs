@@ -5,7 +5,6 @@ using Infrastructure.Queries;
 using Infrastructure.Repositories.AssetManagement;
 using Infrastructure.Repositories.Identity;
 using Infrastructure.Seeds;
-using Infrastructure.Services;
 using Infrastructure.UnitOfWork;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -45,7 +44,6 @@ builder.Services.AddScoped<ILoanService, LoanService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IAssetCategoryService, AssetCategoryService>();
 builder.Services.AddScoped<IStatisticsService, StatisticsService>();
-builder.Services.AddScoped<INotificationService, ConsoleNotificationService>();
 
 builder.Services.AddCors(options =>
 {

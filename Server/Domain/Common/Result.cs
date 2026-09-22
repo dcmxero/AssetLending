@@ -1,4 +1,4 @@
-namespace Domain.Common;
+﻿namespace Domain.Common;
 
 /// <summary>
 /// Represents the outcome of an operation that can either succeed or fail with an error.
@@ -42,17 +42,6 @@ public class Result
     /// </summary>
     /// <param name="error">Description of what went wrong.</param>
     public static Result Failure(string error) => new(false, error, ResultErrorKind.RuleViolation);
-
-    /// <summary>
-    /// Creates a failed result describing something that does not exist.
-    /// </summary>
-    /// <param name="error">Description of what was not found.</param>
-    public static Result NotFound(string error) => new(false, error, ResultErrorKind.NotFound);
-
-    /// <summary>
-    /// Creates a failed result describing a lost race with another user.
-    /// </summary>
-    public static Result ConcurrencyConflict() => new(false, ConcurrencyMessage, ResultErrorKind.ConcurrencyConflict);
 
     /// <summary>
     /// Creates a successful result with a value.
