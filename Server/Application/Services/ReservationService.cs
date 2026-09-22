@@ -15,11 +15,14 @@ public sealed class ReservationService(
     IAssetRepository assetRepository,
     IUserRepository userRepository,
     IUnitOfWork unitOfWork,
+    TimeProvider timeProvider,
     ILogger<ReservationService> logger)
     : IReservationService
 {
     public async Task<Result<ReservationDto>> CreateReservationAsync(CreateReservationDto dto, CancellationToken cancellationToken = default)
     {
+        var now = timeProvider.GetUtcNow().UtcDateTime;
+
         var asset = await assetRepository.GetByIdAsync(dto.AssetId, cancellationToken);
         if (asset is null)
         {
@@ -36,7 +39,7 @@ public sealed class ReservationService(
         if (asset.Status == Domain.Enums.AssetStatus.Reserved)
         {
             var existingReservation = await reservationRepository.GetActiveByAssetIdAsync(asset.Id, cancellationToken);
-            if (existingReservation is not null && existingReservation.IsExpired)
+            if (existingReservation is not null && existingReservation.IsExpiredAt(now))
             {
                 existingReservation.Cancel();
                 asset.CancelReservation();
@@ -55,6 +58,7 @@ public sealed class ReservationService(
         {
             AssetId = asset.Id,
             ReservedById = user.Id,
+            ReservedAt = now,
             ReservedUntil = dto.ReservedUntil
         };
 
@@ -75,11 +79,13 @@ public sealed class ReservationService(
 
         logger.LogInformation("Created reservation {ReservationId} for asset {AssetId} by user {UserId}", reservation.Id, asset.Id, user.Id);
 
-        return Result.Success(reservation.ToDto());
+        return Result.Success(reservation.ToDto(now));
     }
 
     public async Task<Result<ReservationDto>> CancelReservationAsync(int reservationId, CancellationToken cancellationToken = default)
     {
+        var now = timeProvider.GetUtcNow().UtcDateTime;
+
         var reservation = await reservationRepository.GetByIdAsync(reservationId, cancellationToken);
         if (reservation is null)
         {
@@ -112,6 +118,6 @@ public sealed class ReservationService(
 
         logger.LogInformation("Cancelled reservation {ReservationId} for asset {AssetId}", reservation.Id, reservation.AssetId);
 
-        return Result.Success(reservation.ToDto());
+        return Result.Success(reservation.ToDto(now));
     }
 }

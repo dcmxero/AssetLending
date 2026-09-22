@@ -1,4 +1,4 @@
-using Domain.Models.AssetManagement;
+﻿using Domain.Models.AssetManagement;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -20,7 +20,5 @@ public class ReservationConfiguration
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(r => new { r.AssetId, r.IsCancelled });
-
-        builder.Ignore(r => r.IsExpired);
     }
 }

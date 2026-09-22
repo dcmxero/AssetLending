@@ -1,4 +1,4 @@
-using Domain.Common;
+﻿using Domain.Common;
 using Domain.Enums;
 using Domain.Models.Identity;
 
@@ -33,7 +33,7 @@ public class Loan
     /// <summary>
     /// Date and time when the asset was borrowed.
     /// </summary>
-    public DateTime BorrowedAt { get; set; } = DateTime.UtcNow;
+    public DateTime BorrowedAt { get; set; }
 
     /// <summary>
     /// Expected return date.
@@ -53,8 +53,9 @@ public class Loan
     /// <summary>
     /// Marks the loan as returned and records the return timestamp.
     /// </summary>
+    /// <param name="utcNow">The instant the return happened.</param>
     /// <returns>Success if the loan was active; failure with error message otherwise.</returns>
-    public Result MarkReturned()
+    public Result MarkReturned(DateTime utcNow)
     {
         if (Status == LoanStatus.Returned)
         {
@@ -62,7 +63,7 @@ public class Loan
         }
 
         Status = LoanStatus.Returned;
-        ReturnedAt = DateTime.UtcNow;
+        ReturnedAt = utcNow;
         return Result.Success();
     }
 }

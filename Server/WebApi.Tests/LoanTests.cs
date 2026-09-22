@@ -6,12 +6,15 @@ namespace WebApi.Tests;
 
 public class LoanTests
 {
+    private static readonly DateTime Now = new(2026, 5, 1, 12, 0, 0, DateTimeKind.Utc);
+
     private static Loan CreateActiveLoan() => new()
     {
         Id = 1,
         AssetId = 1,
         BorrowedById = 1,
-        DueDate = DateTime.UtcNow.AddDays(7),
+        BorrowedAt = Now,
+        DueDate = Now.AddDays(7),
         Status = LoanStatus.Active
     };
 
@@ -22,12 +25,12 @@ public class LoanTests
         var loan = CreateActiveLoan();
 
         // Act
-        var result = loan.MarkReturned();
+        var result = loan.MarkReturned(Now.AddDays(3));
 
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Equal(LoanStatus.Returned, loan.Status);
-        Assert.NotNull(loan.ReturnedAt);
+        Assert.Equal(Now.AddDays(3), loan.ReturnedAt);
     }
 
     [Fact]
@@ -35,14 +38,28 @@ public class LoanTests
     {
         // Arrange
         var loan = CreateActiveLoan();
-        loan.MarkReturned();
+        loan.MarkReturned(Now.AddDays(3));
 
         // Act
-        var result = loan.MarkReturned();
+        var result = loan.MarkReturned(Now.AddDays(4));
 
         // Assert
         Assert.False(result.IsSuccess);
         Assert.NotNull(result.Error);
+    }
+
+    [Fact]
+    public void MarkReturned_LeavesTheEarlierReturnTimestampUntouched()
+    {
+        // Arrange
+        var loan = CreateActiveLoan();
+        loan.MarkReturned(Now.AddDays(3));
+
+        // Act
+        loan.MarkReturned(Now.AddDays(4));
+
+        // Assert
+        Assert.Equal(Now.AddDays(3), loan.ReturnedAt);
     }
 
     [Fact]
@@ -53,7 +70,7 @@ public class LoanTests
         {
             AssetId = 1,
             BorrowedById = 1,
-            DueDate = DateTime.UtcNow.AddDays(7)
+            DueDate = Now.AddDays(7)
         };
 
         // Assert

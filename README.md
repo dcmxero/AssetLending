@@ -165,6 +165,8 @@ See the IDE note under Prerequisites for the Visual Studio version the solution 
 - **Manual mappers** — extension methods used on the write path, where the entity is already in
   memory; the read path projects to DTOs in the query instead
 - **Optimistic concurrency** — RowVersion on Asset entity prevents simultaneous conflicting operations
+- **Injected clock** — nothing reads `DateTime.UtcNow`; the domain is told the instant, and services
+  and queries take it from `TimeProvider`, so overdue and expiry rules can be tested at a chosen time
 - **Global exception handler** — middleware catches unhandled exceptions and returns standardized error responses
 
 ## Domain Model
@@ -252,6 +254,7 @@ See the IDE note under Prerequisites for the Visual Studio version the solution 
 | **Data access** | Split reads from writes | Entity Framework Core already is a repository and a unit of work, so a second layer that forwards `GetById` and `Add` adds indirection without abstraction. The split keeps the part that pays for itself and drops the part that does not. Writes load whole aggregates, because `Asset.Checkout()` and `Loan.MarkReturned()` need an entity to guard their invariants. Reads never construct an aggregate, so they project to DTOs inside the SQL query and fetch only the columns the response contains. |
 | **Query placement** | Same project as the repositories | A separate `Infrastructure.Queries` project would still have to reference the project holding `ApplicationDbContext`, so the boundary would be one-directional and unenforced. Folders plus architecture tests give the same separation without a third project and without complicating `dotnet ef`. Worth revisiting if the read side ever moves to Dapper, a read replica, or a denormalized read model. |
 | **Contract placement** | `Application/Abstractions` | Interfaces that live in the infrastructure project make the application layer depend on infrastructure, which is the dependency the repository pattern exists to remove. With the contracts in the application layer, `Application` compiles without EF Core at all. |
+| **Time** | Injected `TimeProvider` | Overdue loans and expired reservations are the rules most worth testing and were the hardest, because the code read the system clock at the point of decision. A test could only choose dates relative to the real clock and hope it did not run near a boundary. With the instant supplied, expiry is tested by moving a `FakeTimeProvider` rather than by rewriting data. It also makes each operation use one reading, so a request spanning midnight cannot stamp one date and be judged against another. |
 | **Notification** | Interface + console impl | Defines the contract (`INotificationService`) now so it can be swapped for SMTP/SendGrid in production without touching business logic. Follows the Dependency Inversion Principle. |
 
 ## Frontend
@@ -270,6 +273,7 @@ The Angular SPA provides:
 - Swashbuckle (Swagger/OpenAPI)
 - xUnit + Moq (unit tests)
 - NetArchTest (layer boundary tests)
+- Microsoft.Extensions.TimeProvider.Testing (controllable clock in tests)
 
 **Frontend (Angular):**
 - Angular (standalone components)

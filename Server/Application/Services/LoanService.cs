@@ -19,6 +19,7 @@ public sealed class LoanService(
     IUserRepository userRepository,
     IReservationRepository reservationRepository,
     IUnitOfWork unitOfWork,
+    TimeProvider timeProvider,
     ILogger<LoanService> logger)
     : ILoanService
 {
@@ -39,6 +40,8 @@ public sealed class LoanService(
 
     public async Task<Result<LoanDto>> CreateLoanAsync(CreateLoanDto dto, CancellationToken cancellationToken = default)
     {
+        var now = timeProvider.GetUtcNow().UtcDateTime;
+
         var asset = await assetRepository.GetByIdAsync(dto.AssetId, cancellationToken);
         if (asset is null)
         {
@@ -59,7 +62,7 @@ public sealed class LoanService(
             var reservation = await reservationRepository.GetActiveByAssetIdAsync(asset.Id, cancellationToken);
             if (reservation is not null)
             {
-                if (reservation.IsExpired)
+                if (reservation.IsExpiredAt(now))
                 {
                     reservation.Cancel();
                     asset.CancelReservation();
@@ -94,6 +97,7 @@ public sealed class LoanService(
         {
             AssetId = asset.Id,
             BorrowedById = user.Id,
+            BorrowedAt = now,
             DueDate = dto.DueDate
         };
 
@@ -125,7 +129,7 @@ public sealed class LoanService(
             return Result.NotFound<LoanDto>($"Loan with ID {loanId} not found.");
         }
 
-        var returnResult = loan.MarkReturned();
+        var returnResult = loan.MarkReturned(timeProvider.GetUtcNow().UtcDateTime);
         if (!returnResult.IsSuccess)
         {
             logger.LogWarning("Failed to return loan {LoanId}: {Error}", loanId, returnResult.Error);

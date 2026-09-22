@@ -1,4 +1,4 @@
-using Domain.Models.AssetManagement;
+﻿using Domain.Models.AssetManagement;
 using DTOs.Asset;
 
 namespace Application.Mappers;
@@ -11,7 +11,9 @@ public static class ReservationMapper
     /// <summary>
     /// Maps a <see cref="Reservation"/> domain entity to a <see cref="ReservationDto"/>.
     /// </summary>
-    public static ReservationDto ToDto(this Reservation reservation) => new()
+    /// <param name="reservation">The reservation to map.</param>
+    /// <param name="utcNow">The instant used to decide whether the reservation has expired.</param>
+    public static ReservationDto ToDto(this Reservation reservation, DateTime utcNow) => new()
     {
         Id = reservation.Id,
         AssetId = reservation.AssetId,
@@ -21,6 +23,6 @@ public static class ReservationMapper
         ReservedAt = reservation.ReservedAt,
         ReservedUntil = reservation.ReservedUntil,
         IsCancelled = reservation.IsCancelled,
-        IsExpired = reservation.IsExpired
+        IsExpired = reservation.IsExpiredAt(utcNow)
     };
 }
